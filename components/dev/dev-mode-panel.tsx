@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useSyncExternalStore, useTransition } from "react";
 import { LogOut, Wrench, X } from "lucide-react";
+import { LanguageSelect } from "@/components/voice/language-select";
 import { devOpenAction, devSignOutAction } from "@/app/actions/dev";
 import { DEV_ROLES, DEV_SCREENS } from "@/lib/dev-mode";
 import type { Role } from "@/lib/types";
@@ -92,6 +93,11 @@ export function DevModePanel() {
               ))}
             </div>
           </fieldset>
+
+          <div className="mt-3">
+            <p className="mb-1 text-[0.9rem] font-bold">Language</p>
+            <LanguageSelect compact name="dev-language" />
+          </div>
 
           <ul aria-label="Screens" className="mt-3 grid grid-cols-2 gap-2">
             {DEV_SCREENS.map((screen) => (

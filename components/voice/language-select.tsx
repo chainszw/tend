@@ -23,7 +23,8 @@ import {
  */
 export function LanguageSelect({
   compact = false,
-}: { compact?: boolean } = {}) {
+  name = "voice-language",
+}: { compact?: boolean; name?: string } = {}) {
   const { language } = useVoicePreferences();
   const t = useT();
   const pageLang = useLang();
@@ -56,7 +57,7 @@ export function LanguageSelect({
         >
           <input
             type="radio"
-            name="voice-language"
+            name={name}
             value={option}
             checked={language === option}
             onChange={() => choose(option)}
