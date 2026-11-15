@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Next } from "next/font/google";
-import { DevMode } from "@/components/dev/dev-mode";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -35,7 +34,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to main content
         </a>
         {children}
-        <DevMode />
         <Toaster position="top-center" />
       </body>
     </html>

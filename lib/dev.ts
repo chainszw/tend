@@ -1,7 +1,10 @@
 import "server-only";
-import { isDevModeEnabled } from "@/lib/dev-mode";
 
-/** True when the Dev mode toggle (sign straight into the demo circle) is available. */
+/**
+ * The developer shortcut (sign straight into a demo circle) exists only in
+ * `next dev`. Production builds, including `next start` and Vercel, never
+ * enable it, whatever the environment variables say.
+ */
 export function devAccessEnabled(): boolean {
-  return isDevModeEnabled(process.env);
+  return process.env.NODE_ENV === "development";
 }

@@ -116,9 +116,6 @@ Last updated: 2026-11-15 ~15:30 IST.
       integration (same project as local); the other secrets were added with `vercel env add`.
       `ADAPTION_STACK_SLUG` is still unset. Public pages, tab title/icon, Beta pill, cron 401 checked;
       a real sign-in on production is NOT yet verified.
-- [x] Dev mode toggle (bottom-right corner, `components/dev/*`, `lib/dev-mode.ts`): signs judges into the
-      shared demo circle `DEMO-0000` (role switch Elder/Family/Caretaker; off = sign out). Always on in
-      `next dev`; in production only when env `DEV_MODE=on` (set on Vercel; remove to disable).
 - [ ] Run `supabase/cron.sql` with the live URL (USER, in the Supabase SQL editor)
 - [ ] Production smoke test, submission #1, final submission #2
 
