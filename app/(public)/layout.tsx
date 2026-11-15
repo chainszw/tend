@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DevAccess } from "@/components/public/dev-access";
 import { Wordmark } from "@/components/wordmark";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -17,6 +18,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
         </nav>
       </header>
       <main id="main" className="flex-1">
+        <DevAccess />
         {children}
       </main>
       <footer className="mx-auto w-full max-w-6xl px-5 py-8 text-[0.95rem] text-muted-foreground">

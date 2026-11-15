@@ -71,6 +71,9 @@ Last updated: 2026-11-15 ~12:25 IST.
       "check reminders" button removed)
 - [x] `supabase/migrations/002_passcode_enc.sql` run in Supabase; invite flow browser-tested
       (reveal, share, link pre-fill, change passcode, old-circle reset prompt, 390px phone)
+- [x] Dev shortcut: in `npm run dev` only (`lib/dev.ts`, NODE_ENV === "development"), the public
+      pages show "Developer shortcut" buttons that sign straight into demo circle `DEMO-0000`
+      (auto-seeded: 3 members, 4 medicines, 1 visit; random unknown passcode). Absent in prod.
 - [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 
