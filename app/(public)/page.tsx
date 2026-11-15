@@ -13,7 +13,7 @@ const FEATURES = [
   {
     icon: UsersRound,
     title: "One schedule the whole family sees",
-    body: "The person being cared for, their family and their caretakers open the same family with a code and passcode. Anyone can add a medicine or an appointment, and everyone sees who changed what.",
+    body: "The person being cared for, their family and their caretakers open the same shared space with a family code and passcode. Anyone can add a medicine or an appointment, and everyone sees who changed what.",
   },
   {
     icon: BellRing,

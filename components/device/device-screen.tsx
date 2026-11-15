@@ -300,7 +300,7 @@ export function DeviceScreen({
           <p className="text-[34px] font-extrabold leading-none">{elderName ? "Saved" : "Done"}</p>
           <p className="max-w-[420px] text-[20px] leading-snug text-[#d6e4dc]">
             {elderName
-              ? `Added to ${elderName}'s family. The family can see it now.`
+              ? `Added to ${elderName}'s family. Everyone can see it now.`
               : "This demo reading stays on this page only. Join a family to keep readings."}
           </p>
         </div>

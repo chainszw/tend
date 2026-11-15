@@ -85,7 +85,7 @@ export function InviteCard({ code, elderName }: { code: string; elderName: strin
       const secret = await loadPasscode();
       if (!secret) return;
       const link = `${window.location.origin}/join?code=${encodeURIComponent(code)}`;
-      const text = `Join ${elderName}'s family on Tend.\nOpen ${link}\nCircle code: ${code}\nPasscode: ${secret}`;
+      const text = `Join ${elderName}'s family on Tend.\nOpen ${link}\nFamily code: ${code}\nPasscode: ${secret}`;
       if (typeof navigator.share === "function") {
         try {
           await navigator.share({ title: "Join our family on Tend", text });
