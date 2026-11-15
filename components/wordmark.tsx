@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 /** Two-tone capsule mark: the app's one recurring motif. */
 export function Capsule({ className = "" }: { className?: string }) {
   return (
@@ -13,11 +11,16 @@ export function Capsule({ className = "" }: { className?: string }) {
   );
 }
 
-export function Wordmark({ href = "/" }: { href?: string }) {
+/**
+ * Always goes back to the landing page with a full page load (a plain link,
+ * not a client-side Link), from any screen, signed in or not.
+ */
+export function Wordmark() {
   return (
-    <Link href={href} className="inline-flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+    // eslint-disable-next-line @next/next/no-html-link-for-pages -- a full reload is intended
+    <a href="/" className="inline-flex items-center gap-2 text-2xl font-extrabold tracking-tight">
       <Capsule />
       Tend
-    </Link>
+    </a>
   );
 }

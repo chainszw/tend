@@ -41,7 +41,7 @@ export default async function CircleLayout({
         <header className="border-b-2 border-border bg-card">
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
             <div className="flex min-w-0 flex-col">
-              <Wordmark href="/circle" />
+              <Wordmark />
               <p className="truncate text-[0.95rem] text-muted-foreground">
                 {t.circleLine(circle.elder_name, session.name)}
               </p>

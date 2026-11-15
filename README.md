@@ -1,4 +1,8 @@
-# Tend
+<p align="center">
+  <img src="app/icon.svg" alt="Tend logo: a two-tone green and amber capsule" width="96" height="96">
+</p>
+
+<h1 align="center">Tend</h1>
 
 **A shared family space for one older person.** The elder, their family and their caretakers
 manage medicines and doctor visits in one place, and get an email when something is due or
