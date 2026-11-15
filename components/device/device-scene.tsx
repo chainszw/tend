@@ -11,7 +11,7 @@ import {
   RoundedBox,
 } from "@react-three/drei";
 import * as THREE from "three";
-import { SCREEN_WIDTH } from "@/components/device/device-screen";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/components/device/device-screen";
 import { DEVICE_PARTS } from "@/lib/device/parts";
 import { cuffPressure, type ReadingKind } from "@/lib/device/readings";
 
@@ -41,6 +41,18 @@ const TILT = Math.atan(BODY_HEIGHT * SLOPE);
 const SHELL_LIFT = 2.15;
 const SCREEN_WORLD_WIDTH = 1.15;
 const HTML_UNITS_PER_PIXEL = 1 / 40; // drei's `Html transform` default
+/**
+ * drei centres transformed Html with `translate(-50%, -50%)` around its own box, then magnifies
+ * the result ~170x. At fractional browser zoom the box size rounds and the LCD drifts off the
+ * glass. Centring with fixed offsets instead leaves drei's wrapper zero-sized, so nothing rounds.
+ */
+const LCD_STYLE = {
+  position: "absolute",
+  left: -SCREEN_WIDTH / 2,
+  top: -SCREEN_HEIGHT / 2,
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
+} as const;
 
 function arc(cx: number, cy: number, radius: number, from: number, to: number, steps = 10) {
   return Array.from({ length: steps + 1 }, (_, index) => {
@@ -674,6 +686,7 @@ function Station(props: DeviceSceneProps) {
             scale={SCREEN_WORLD_WIDTH / (SCREEN_WIDTH * HTML_UNITS_PER_PIXEL)}
             zIndexRange={[10, 0]}
             portal={overlay}
+            style={LCD_STYLE}
           >
             {props.children}
           </Html>
