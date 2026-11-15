@@ -17,6 +17,8 @@ const en = {
   resetTextSize: "Reset to standard",
   language: "Language",
   languageLegend: "Language for the app, voice and answers",
+  beta: "Beta",
+  hindiBetaNote: "Hindi voice and translation are in beta. Some pages are still in English.",
   mainNav: "Main",
   nav: { today: "Today", medicines: "Medicines", visits: "Visits", health: "Health", ask: "Ask", family: "Family" },
 
@@ -126,6 +128,8 @@ const hi: Messages = {
   resetTextSize: "सामान्य आकार पर लौटें",
   language: "भाषा",
   languageLegend: "ऐप, आवाज़ और जवाबों की भाषा",
+  beta: "बीटा",
+  hindiBetaNote: "हिन्दी आवाज़ और अनुवाद अभी बीटा में हैं। कुछ पन्ने अभी अंग्रेज़ी में हैं।",
   mainNav: "मुख्य",
   nav: { today: "आज", medicines: "दवाइयाँ", visits: "डॉक्टर", health: "सेहत", ask: "पूछें", family: "परिवार" },
 

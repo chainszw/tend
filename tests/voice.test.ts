@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   LANGUAGE_LABELS,
+  isBetaLanguage,
   isVoiceLanguage,
   listeningError,
   pickVoice,
@@ -17,6 +18,11 @@ describe("voice languages", () => {
     expect(isVoiceLanguage("hi")).toBe(true);
     expect(isVoiceLanguage("mr")).toBe(false);
     expect(isVoiceLanguage(undefined)).toBe(false);
+  });
+
+  it("marks Hindi, and only Hindi, as beta", () => {
+    expect(isBetaLanguage("hi")).toBe(true);
+    expect(isBetaLanguage("en")).toBe(false);
   });
 });
 

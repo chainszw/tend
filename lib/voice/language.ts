@@ -11,6 +11,13 @@ export const LANGUAGE_LABELS: Record<VoiceLanguage, string> = {
   hi: "हिन्दी",
 };
 
+/** Languages whose voice and page translation are still being finished. */
+export const BETA_LANGUAGES: readonly VoiceLanguage[] = ["hi"];
+
+export function isBetaLanguage(language: VoiceLanguage): boolean {
+  return BETA_LANGUAGES.includes(language);
+}
+
 /** Indian locales, so recognition and pronunciation use an Indian accent. */
 export const LANGUAGE_TAGS: Record<VoiceLanguage, string> = {
   en: "en-IN",

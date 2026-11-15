@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
 import { setLanguageAction } from "@/app/actions/circle";
-import { useT } from "@/components/i18n/language-provider";
+import { useLang, useT } from "@/components/i18n/language-provider";
 import {
   setVoicePreferences,
   stopSpeaking,
@@ -13,6 +13,7 @@ import {
 import {
   LANGUAGE_LABELS,
   VOICE_LANGUAGES,
+  isBetaLanguage,
   type VoiceLanguage,
 } from "@/lib/voice/language";
 
@@ -25,6 +26,7 @@ export function LanguageSelect({
 }: { compact?: boolean } = {}) {
   const { language } = useVoicePreferences();
   const t = useT();
+  const pageLang = useLang();
   const router = useRouter();
   const [, startTransition] = useTransition();
 
@@ -61,6 +63,14 @@ export function LanguageSelect({
             className="sr-only"
           />
           {LANGUAGE_LABELS[option]}
+          {isBetaLanguage(option) ? (
+            <span
+              lang={pageLang}
+              className="ml-2 rounded-full bg-amber px-2 py-0.5 text-[0.7rem] font-extrabold uppercase tracking-wide text-foreground"
+            >
+              {t.beta}
+            </span>
+          ) : null}
         </label>
       ))}
     </fieldset>

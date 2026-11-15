@@ -8,7 +8,7 @@ import { getCircle, listReadings } from "@/lib/data";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Tend Home Station",
+  title: "Home Station",
   description:
     "An interactive 3D prototype of the Tend Home Station: one simple device for blood pressure, blood oxygen, temperature and weight, with spoken guidance.",
 };

@@ -12,7 +12,7 @@ const atkinson = Atkinson_Hyperlegible_Next({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Tend: shared medicine and appointment care", template: "%s | Tend" },
+  title: { default: "Tend", template: "Tend | %s" },
   description:
     "Tend helps an older person, their family and caretakers manage medicines, doctor appointments and reminders together.",
 };

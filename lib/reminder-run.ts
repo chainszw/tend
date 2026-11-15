@@ -167,7 +167,10 @@ export async function runReminders(onlyCircleId?: string): Promise<ReminderRunRe
   const logsByCircle = groupBy((logs.data ?? []) as Scoped<LoggedDose>[]);
   const appointmentsByCircle = groupBy((appointments.data ?? []) as Scoped<ReminderAppointment>[]);
   const membersByCircle = groupBy((members.data ?? []) as Scoped<Recipient>[]);
-  const appUrl = optionalEnv("APP_URL") ?? "http://localhost:3000";
+  // On Vercel the production domain is known without any configuration.
+  const vercelHost = optionalEnv("VERCEL_PROJECT_PRODUCTION_URL");
+  const appUrl =
+    optionalEnv("APP_URL") ?? (vercelHost ? `https://${vercelHost}` : "http://localhost:3000");
 
   for (const circle of circles as CircleRow[]) {
     const due = selectReminders({

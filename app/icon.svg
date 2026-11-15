@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Tend</title>
+  <defs>
+    <clipPath id="pill">
+      <rect x="2" y="9.5" width="28" height="13" rx="6.5" />
+    </clipPath>
+  </defs>
+  <g transform="rotate(-45 16 16)">
+    <g clip-path="url(#pill)">
+      <rect x="2" y="9.5" width="14" height="13" fill="#17513c" />
+      <rect x="16" y="9.5" width="14" height="13" fill="#f2b33d" />
+    </g>
+    <rect x="2" y="9.5" width="28" height="13" rx="6.5" fill="none" stroke="#0f3a2b" stroke-opacity="0.3" />
+  </g>
+</svg>

@@ -107,7 +107,11 @@ Last updated: 2026-11-15 ~15:30 IST.
       far: shell, nav, Settings, Today, Ask. Medicines/Visits/Health/Family still English.
 - [x] Health page: "Enter a reading yourself" manual form (`addManualReadingAction`, pure
       `readingFromTyped` in `lib/device/readings.ts`) + "Smart watch — Coming soon" placeholder card (UI only).
-- [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
+- [x] Finalization: Hindi labelled "Beta" in `LanguageSelect` (`isBetaLanguage` in
+      `lib/voice/language.ts`, note in Settings); browser tab = `app/icon.svg` capsule + title
+      "Tend" (template `Tend | %s`); README rewritten feature by feature; 143 tests green.
+      `APP_URL` is optional on Vercel (falls back to `VERCEL_PROJECT_PRODUCTION_URL`).
+- [ ] Vercel deploy (set env vars; `APP_URL` optional), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 
 ## Known gaps / ideas if time allows
@@ -126,4 +130,4 @@ Last updated: 2026-11-15 ~15:30 IST.
   duplicated business logic.
 
 ## Next step
-Design overhaul (user will brief), then deploy.
+Deploy to Vercel, run `supabase/cron.sql`, production smoke test, submit.

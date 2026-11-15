@@ -115,6 +115,9 @@ export function SettingsMenu({ initial }: { initial: number }) {
               {t.language}
             </h2>
             <LanguageSelect compact />
+            <p className="mt-2 text-[0.9rem] text-muted-foreground">
+              {t.hindiBetaNote}
+            </p>
           </section>
         </div>
       )}
