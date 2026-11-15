@@ -1,3 +1,4 @@
+import type { VoiceLanguage } from "@/lib/voice/language";
 import "server-only";
 import { respond, type AdaptionMessage } from "@/lib/adaption";
 import {
@@ -75,7 +76,14 @@ export interface CompanionContext {
   speakerRole: string;
   localTime: string;
   careRecord: string;
+  /** The language the person chose for answers. English when not given. */
+  language?: VoiceLanguage;
 }
+
+const ANSWER_LANGUAGE: Record<VoiceLanguage, string> = {
+  en: "Answer in English.",
+  hi: "Answer only in Hindi, written in Devanagari script, in simple everyday words. Keep medicine names exactly as written in the care record. Do not mix in English sentences.",
+};
 
 /** Answers a question in plain language, grounded on the care record and our adapted dataset. */
 export async function companionReply(
@@ -90,6 +98,8 @@ How to answer:
 - Answer the question directly first, then add one helpful next step if there is one.
 - Keep ${context.elderName} in charge: offer information and options, and encourage them to decide with their doctor.
 - Use the care guidance you can search when it is relevant.
+- ${ANSWER_LANGUAGE[context.language ?? "en"]}
+- Write plain sentences only: no markdown, bullet symbols or headings, because the answer may be read aloud.
 
 ${SAFETY_RULES}
 

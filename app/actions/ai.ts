@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_VOICE_LANGUAGE, isVoiceLanguage } from "@/lib/voice/language";
 import { companionReply, extractMedications, transcribePrescriptionImage, writeDigest } from "@/lib/ai";
 import { adaptionConfigured } from "@/lib/adaption";
 import type { MedicationDraft } from "@/lib/ai-parse";
@@ -105,7 +106,7 @@ export interface CompanionResult {
 }
 
 /** Answers a Care Companion question using the circle's own care record. */
-export async function askCompanionAction(messages: unknown): Promise<CompanionResult> {
+export async function askCompanionAction(messages: unknown, language?: unknown): Promise<CompanionResult> {
   const session = await requireSession();
   if (!adaptionConfigured()) return { ok: false, message: NOT_CONFIGURED };
   if (!allowAi(session.memberId)) return { ok: false, message: SLOW_DOWN };
@@ -140,6 +141,7 @@ export async function askCompanionAction(messages: unknown): Promise<CompanionRe
         speakerRole: session.role === "elder" ? "the person being cared for" : ROLE_LABELS[session.role],
         localTime: formatDateTime(snapshot.now.toISOString(), circle.timezone),
         careRecord,
+        language: isVoiceLanguage(language) ? language : DEFAULT_VOICE_LANGUAGE,
       },
       parsed.data.messages,
     );

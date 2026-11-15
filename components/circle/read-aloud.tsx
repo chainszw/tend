@@ -1,49 +1,45 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useId } from "react";
 import { Square, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const subscribeNever = () => () => {};
-const speechSupported = () => "speechSynthesis" in window;
-const notOnServer = () => false;
+import { useSpeech } from "@/components/voice/voice-store";
 
 interface ReadAloudProps {
   text: string;
   label?: string;
   variant?: "outline" | "quiet";
+  /** Names this speaker, so speech started elsewhere (auto read-aloud) shows Stop here. */
+  speechId?: string;
 }
 
-/** Reads text aloud with the browser's built-in voice. Hidden where unsupported. */
-export function ReadAloud({ text, label = "Read this aloud", variant = "outline" }: ReadAloudProps) {
-  const supported = useSyncExternalStore(subscribeNever, speechSupported, notOnServer);
-  const [speaking, setSpeaking] = useState(false);
-
-  // Stop any speech when leaving the page.
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+/** Reads text aloud in the chosen language with the shared voice. Hidden where unsupported. */
+export function ReadAloud({ text, label = "Read this aloud", variant = "outline", speechId }: ReadAloudProps) {
+  const ownId = useId();
+  const { supported, speaking, speak, stop } = useSpeech(speechId ?? ownId);
 
   if (!supported) return null;
 
-  function toggle() {
-    const synth = window.speechSynthesis;
-    if (speaking) {
-      synth.cancel();
-      setSpeaking(false);
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    synth.cancel();
-    synth.speak(utterance);
-    setSpeaking(true);
-  }
-
   return (
-    <Button type="button" variant={variant} onClick={toggle} aria-pressed={speaking}>
+    <Button
+      type="button"
+      variant={speaking ? "amber" : variant}
+      onClick={() => (speaking ? stop() : speak(text))}
+      aria-pressed={speaking}
+    >
       {speaking ? <Square aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
       {speaking ? "Stop reading" : label}
+      {speaking ? (
+        <span aria-hidden="true" className="ml-1 flex items-end gap-0.5">
+          {[0, 150, 300].map((delay) => (
+            <span
+              key={delay}
+              className="h-3 w-1 origin-bottom rounded-full bg-current motion-safe:animate-pulse"
+              style={{ animationDelay: `${delay}ms` }}
+            />
+          ))}
+        </span>
+      ) : null}
     </Button>
   );
 }

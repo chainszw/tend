@@ -230,6 +230,31 @@ describe("voice commands", () => {
     expect(parseVoiceCommand("go back")).toEqual({ type: "back" });
     expect(parseVoiceCommand("yes save it")).toEqual({ type: "save" });
     expect(parseVoiceCommand("what is the weather")).toBeNull();
+    expect(parseVoiceCommand("What is my oxygen level?")).toEqual({ type: "select", kind: "spo2" });
+    expect(parseVoiceCommand("Read my latest health report")).toEqual({ type: "history" });
+  });
+
+  it("understands Hindi commands", () => {
+    expect(parseVoiceCommand("मेरा ब्लड प्रेशर चेक करो")).toEqual({ type: "select", kind: "bp" });
+    expect(parseVoiceCommand("मेरा ऑक्सीजन लेवल कितना है")).toEqual({ type: "select", kind: "spo2" });
+    expect(parseVoiceCommand("मुझे बुखार है क्या")).toEqual({ type: "select", kind: "temp" });
+    expect(parseVoiceCommand("मेरा वज़न नापो")).toEqual({ type: "select", kind: "weight" });
+    expect(parseVoiceCommand("मेरा वजन नापो")).toEqual({ type: "select", kind: "weight" });
+    expect(parseVoiceCommand("मेरी पिछली रिपोर्ट पढ़ो")).toEqual({ type: "history" });
+    expect(parseVoiceCommand("शुरू करो")).toEqual({ type: "start" });
+    expect(parseVoiceCommand("रुको")).toEqual({ type: "stop" });
+    expect(parseVoiceCommand("वापस जाओ")).toEqual({ type: "back" });
+    expect(parseVoiceCommand("हाँ सेव करो")).toEqual({ type: "save" });
+    expect(parseVoiceCommand("आज मौसम कैसा है")).toBeNull();
+  });
+
+  it("speaks in Hindi and asks before saving", () => {
+    const bp = { kind: "bp" as const, systolic: 128, diastolic: 82, pulse: 70, irregular: false };
+    const said = spokenPrompt({ screen: "result", kind: "bp", reading: bp }, true, "hi");
+    expect(said).toMatch(/128 बटा 82/);
+    expect(said).toMatch(/सेव करना चाहेंगे/);
+    expect(spokenPrompt({ screen: "result", kind: "bp", reading: bp }, true)).toMatch(/Would you like to save/);
+    expect(spokenPrompt({ screen: "menu", kind: null, reading: null }, true, "hi")).toMatch(/नापना/);
   });
 });
 

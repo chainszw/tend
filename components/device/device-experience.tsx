@@ -18,8 +18,11 @@ import { saveReadingAction } from "@/app/actions/readings";
 import { DeviceScreen, SCREEN_HEIGHT, SCREEN_WIDTH } from "@/components/device/device-screen";
 import type { DeviceView } from "@/components/device/device-scene";
 import { InsidePanel } from "@/components/device/inside-panel";
-import { useVoice } from "@/components/device/use-voice";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { LanguageSelect } from "@/components/voice/language-select";
+import { MicButton } from "@/components/voice/mic-button";
+import { useListening } from "@/components/voice/use-listening";
+import { stopSpeaking, useSpeech, useVoicePreferences } from "@/components/voice/voice-store";
 import {
   INITIAL_DEVICE_STATE,
   PRIMARY_LABELS,
@@ -86,6 +89,7 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
   const [wide, setWide] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [error, setError] = useState("");
+  const [unclear, setUnclear] = useState(false);
   const [saving, startSaving] = useTransition();
   const startedAt = useRef(0);
   const reducedMotion = useSyncExternalStore(
@@ -150,6 +154,7 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
   const handleHeard = useCallback(
     (transcript: string) => {
       const command = parseVoiceCommand(transcript);
+      setUnclear(command === null);
       if (!command) return;
       if (command.type === "select") dispatch(command);
       else if (command.type === "history") dispatch({ type: "history" });
@@ -158,8 +163,12 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
     },
     [intent, handlePrimary],
   );
-  const voice = useVoice(handleHeard);
-  const { speak, silence } = voice;
+  const { language } = useVoicePreferences();
+  const mic = useListening(handleHeard);
+  const { speak, stop: silence } = useSpeech("device");
+
+  // Leaving the page stops the device talking.
+  useEffect(() => stopSpeaking, []);
 
   // Start-up animation.
   useEffect(() => {
@@ -194,9 +203,9 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
 
   // The device speaks each step, like a helper sitting beside the person.
   useEffect(() => {
-    if (voiceOn) speak(spokenPrompt(state, signedIn));
+    if (voiceOn) speak(spokenPrompt(state, signedIn, language));
     else silence();
-  }, [state, signedIn, voiceOn, speak, silence]);
+  }, [state, signedIn, voiceOn, language, speak, silence]);
 
   const view: DeviceView = inside
     ? "inside"
@@ -214,10 +223,10 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
       history={history}
       elderName={elderName}
       saving={saving}
-      voice={{ canListen: voice.canListen, listening: voice.listening, heard: voice.heard }}
+      voice={{ canListen: mic.canListen, listening: mic.listening, heard: mic.interim || mic.heard }}
       onAction={handleAction}
       onPrimary={handlePrimary}
-      onListen={voice.toggleListening}
+      onListen={mic.toggle}
     />
   );
 
@@ -311,6 +320,37 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
             {voiceOn ? <Volume2 aria-hidden="true" /> : <VolumeX aria-hidden="true" />}
             {voiceOn ? "Voice on" : "Voice off"}
           </Button>
+        </div>
+        <div className="flex flex-col gap-3 border-t-2 border-border pt-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {mic.canListen ? (
+              <MicButton listening={mic.listening} onToggle={mic.toggle} disabled={!powered || screen === "boot"} label="Speak to the device" />
+            ) : null}
+            <LanguageSelect />
+          </div>
+          <p role="status" aria-live="polite" lang={mic.listening || mic.heard ? language : undefined} className="min-h-7 text-lg">
+            {mic.listening ? (
+              <>
+                <span className="font-bold">Listening… </span>
+                {mic.interim}
+              </>
+            ) : mic.error ? (
+              <span className="font-bold text-destructive">{mic.error}</span>
+            ) : mic.heard ? (
+              <>
+                Heard: “{mic.heard}”.
+                {unclear ? " I did not understand that. Try again, or use the buttons." : ""}
+              </>
+            ) : mic.canListen ? (
+              <span className="text-muted-foreground">
+                Say what to measure, then “start”. A reading is only saved after you say “yes” or press Save.
+              </span>
+            ) : (
+              <span className="text-muted-foreground">
+                This browser cannot listen. The device still speaks each step; use the buttons.
+              </span>
+            )}
+          </p>
         </div>
         <p className="text-muted-foreground">
           {signedIn ? (

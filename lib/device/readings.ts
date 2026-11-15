@@ -1,3 +1,4 @@
+import type { VoiceLanguage } from "@/lib/voice/language";
 import { z } from "zod";
 
 /**
@@ -48,6 +49,21 @@ export const PREPARE_STEPS: Record<ReadingKind, string[]> = {
   spo2: ["Warm your hand if it is cold.", "Put the clip on your first finger.", "Keep your hand still."],
   temp: ["Take the thermometer from its holder.", "Place the tip under your tongue.", "Close your mouth and wait."],
   weight: ["Put the scale on a hard, flat floor.", "Step on with bare feet.", "Stand still and look ahead."],
+};
+
+/** Spoken Hindi names and steps, for the voice assistant. The screen text stays as above. */
+export const KIND_LABELS_HI: Record<ReadingKind, string> = {
+  bp: "ब्लड प्रेशर",
+  spo2: "ऑक्सीजन स्तर",
+  temp: "तापमान",
+  weight: "वज़न",
+};
+
+export const PREPARE_STEPS_HI: Record<ReadingKind, string[]> = {
+  bp: ["बैठ जाइए और अपना हाथ मेज़ पर रखिए।", "पट्टी को बाँह के ऊपरी हिस्से पर लपेटिए।", "स्थिर रहिए और बात मत कीजिए।"],
+  spo2: ["हाथ ठंडा हो तो उसे गरम कर लीजिए।", "क्लिप को पहली उँगली पर लगाइए।", "हाथ स्थिर रखिए।"],
+  temp: ["थर्मामीटर को उसके होल्डर से निकालिए।", "उसकी नोक जीभ के नीचे रखिए।", "मुँह बंद करके रुकिए।"],
+  weight: ["तराज़ू को सख़्त, समतल फ़र्श पर रखिए।", "नंगे पैर उस पर खड़े हो जाइए।", "स्थिर खड़े रहिए और सामने देखिए।"],
 };
 
 /** How long the simulated measurement runs. */
@@ -159,7 +175,8 @@ export function describeReading(reading: ReadingInput): string {
 }
 
 /** A sentence for the voice assistant to say when a result appears. */
-export function spokenReading(reading: ReadingInput): string {
+export function spokenReading(reading: ReadingInput, language: VoiceLanguage = "en"): string {
+  if (language === "hi") return spokenReadingHindi(reading);
   const said =
     reading.kind === "bp"
       ? `Your blood pressure is ${reading.systolic} over ${reading.diastolic}. Pulse ${reading.pulse}.`
@@ -169,6 +186,27 @@ export function spokenReading(reading: ReadingInput): string {
           ? `Your temperature is ${reading.temperature_c.toFixed(1)} degrees Celsius.`
           : `Your weight is ${reading.weight_kg.toFixed(1)} kilograms.`;
   return `${said} ${assessReading(reading).message}`;
+}
+
+/** The same guidance as `assessReading`, spoken in Hindi. General guidance, never a diagnosis. */
+function spokenAdviceHindi(reading: ReadingInput): string {
+  const { level } = assessReading(reading);
+  if (reading.kind === "weight") return "वज़न दर्ज हो गया।";
+  if (level === "ok") return "यह सामान्य सीमा में है।";
+  if (level === "alert") return "यह सामान्य से बहुत अलग है। आराम कीजिए, दोबारा नापिए और अपने डॉक्टर को फ़ोन कीजिए।";
+  return "यह सामान्य से थोड़ा अलग है। आराम करके दोबारा नापिए और अपने परिवार या डॉक्टर को बताइए।";
+}
+
+function spokenReadingHindi(reading: ReadingInput): string {
+  const said =
+    reading.kind === "bp"
+      ? `आपका ब्लड प्रेशर ${reading.systolic} बटा ${reading.diastolic} है। नब्ज़ ${reading.pulse}।`
+      : reading.kind === "spo2"
+        ? `आपका ऑक्सीजन स्तर ${reading.spo2} प्रतिशत है। नब्ज़ ${reading.pulse}।`
+        : reading.kind === "temp"
+          ? `आपका तापमान ${reading.temperature_c.toFixed(1)} डिग्री सेल्सियस है।`
+          : `आपका वज़न ${reading.weight_kg.toFixed(1)} किलो है।`;
+  return `${said} ${spokenAdviceHindi(reading)}`;
 }
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
