@@ -12,7 +12,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
             Join with a code
           </Link>
           <Link href="/create" className={buttonVariants({ size: "sm", className: "max-sm:hidden" })}>
-            Start a circle
+            Create a family
           </Link>
         </nav>
       </header>
