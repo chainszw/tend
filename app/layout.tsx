@@ -8,6 +8,7 @@ import "./globals.css";
 const atkinson = Atkinson_Hyperlegible_Next({
   variable: "--font-atkinson",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
   adjustFontFallback: false,
 });

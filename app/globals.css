@@ -24,6 +24,7 @@
   --color-well: var(--well);
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
+  --color-leaf: var(--leaf);
   --color-leaf-soft: var(--leaf-soft);
   --color-alarm-soft: var(--alarm-soft);
   --font-sans: var(--font-atkinson), Verdana, system-ui, sans-serif;
@@ -52,6 +53,7 @@
   --ring: #0b4dcc;
   --amber: #f2b33d;
   --amber-soft: #fdf0d2;
+  --leaf: #23794f;
   --leaf-soft: #d9eedf;
   --destructive: #a8231b;
   --alarm-soft: #fbe3e0;

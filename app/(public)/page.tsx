@@ -68,7 +68,7 @@ export default function LandingPage() {
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-16 pt-8 lg:grid-cols-[1.05fr_1fr] lg:pt-14">
         <div className="flex flex-col gap-6">
           <h1 className="text-[2.6rem] font-extrabold sm:text-[3.4rem]">
-            Every medicine taken, every doctor visit remembered, together.
+            Be healthy, be <em className="font-extrabold text-leaf">happy</em>.
           </h1>
           <p className="max-w-[34rem] text-xl text-muted-foreground">
             Tend is a shared family space for one older person. They stay in charge of their own
