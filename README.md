@@ -38,6 +38,26 @@ separate accessory around one small unit with a screen, three large buttons and 
 The readings are simulated. This is a design prototype, not a manufactured or clinically
 validated medical device. Database: run `supabase/migrations/003_readings.sql` once.
 
+## Voice (English and Hindi)
+One shared voice system serves the Care Companion (Ask) and the Home Station:
+`lib/voice/language.ts` (pure, tested) plus `components/voice/*`.
+
+- **Language**: English or हिन्दी, chosen on either page and remembered on both
+  (stored in the browser only).
+- **Speaking**: the browser's Web Speech API (`speechSynthesis`). The app picks the most
+  natural voice installed (neural and Google voices first, then an Indian accent). Only one
+  thing speaks at a time and it can be stopped at once.
+- **Listening**: the browser's `SpeechRecognition` (Chrome, Edge, Safari) in `en-IN` or
+  `hi-IN`. On Ask, the words go into the question box to be checked and edited; they are
+  never sent automatically. Where listening is unavailable, typing and buttons still work.
+- **Device**: spoken steps and results in the chosen language, voice commands in both, and a
+  reading is saved only after "yes" / "हाँ" or the Save button.
+- **Licence and privacy**: no speech model, voice asset, paid service or API key is added;
+  it is a web-standard browser API. The app keeps no audio. Recognition is done by the
+  browser, which in Chrome uses the browser vendor's speech service.
+- **Limits**: voice quality depends on the voices installed on the device. Marathi is not
+  supported. The device's on-screen text is English; its speech and commands are bilingual.
+
 ## How Adaption AI is used
 
 All AI features call [Adaption](https://docs.adaptionlabs.ai) from the server (`lib/adaption.ts`).

@@ -45,7 +45,7 @@ family digests and appointment prep.
 See `.env.example`. Local values live in `.env.local` (git-ignored).
 
 ## Status (update after every milestone)
-Last updated: 2026-11-15 ~14:30 IST.
+Last updated: 2026-11-15 ~15:30 IST.
 - [x] Scaffold, deps, shadcn, git init, schema.sql, cron.sql, .env.example
 - [x] lib: db, session, passcode, lockout, validation, schedule, adherence, reminders,
       reminder-run, email (+templates), adaption, ai (+ai-parse), data, snapshot
@@ -90,6 +90,15 @@ Last updated: 2026-11-15 ~14:30 IST.
       digest facts. Voice: speechSynthesis guidance + SpeechRecognition commands (Chrome);
       Permissions-Policy now `microphone=(self)`.
 - [x] `supabase/migrations/003_readings.sql` run in Supabase; user confirmed saving works
+- [x] Shared voice, English + Hindi (lean scope chosen for time; no Marathi, no neural TTS, no
+      voice picker): `lib/voice/language.ts` (pure: languages, `pickVoice`, `speakable`,
+      `splitForSpeech`; `tests/voice.test.ts`) + `components/voice/*` (`voice-store.ts` = language
+      + auto-read in localStorage and the single speech channel; `use-listening.ts`;
+      `language-select.tsx`; `mic-button.tsx`). Ask: mic fills the editable box (never
+      auto-submits), play/stop per answer, auto-read, `askCompanionAction(messages, language)`.
+      Device: Hindi prompts/commands in `lib/device/machine.ts` + `readings.ts`, "Speak to the
+      device" button on every screen, save only after yes/Save. Tested in headless Chrome with a
+      simulated recogniser; real mic input and audio quality NOT yet checked by ear.
 - [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 
