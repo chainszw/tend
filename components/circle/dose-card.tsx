@@ -1,0 +1,97 @@
+"use client";
+
+import { useTransition } from "react";
+import { AlarmClock, Check, CircleSlash, Clock3, TriangleAlert, Undo2 } from "lucide-react";
+import { toast } from "sonner";
+import { logDoseAction } from "@/app/actions/medications";
+import { Button } from "@/components/ui/button";
+import type { DoseStatus } from "@/lib/adherence";
+import { formatTime } from "@/lib/schedule";
+
+export interface DoseCardProps {
+  medicationId: string;
+  scheduledFor: string;
+  time: string;
+  name: string;
+  dosage: string;
+  instructions: string;
+  status: DoseStatus;
+}
+
+const STATUS = {
+  taken: { label: "Taken", icon: Check, chip: "bg-primary text-primary-foreground", card: "border-primary bg-leaf-soft" },
+  skipped: { label: "Skipped", icon: CircleSlash, chip: "bg-well text-foreground", card: "border-border bg-card" },
+  missed: { label: "Not marked yet", icon: TriangleAlert, chip: "bg-destructive text-white", card: "border-destructive bg-card" },
+  due: { label: "Due now", icon: AlarmClock, chip: "bg-amber text-foreground", card: "border-amber bg-amber-soft" },
+  later: { label: "Later", icon: Clock3, chip: "bg-well text-foreground", card: "border-border bg-card" },
+} as const;
+
+/** One dose in the organiser, with large Taken / Skip buttons. */
+export function DoseCard(props: DoseCardProps) {
+  const { medicationId, scheduledFor, time, name, dosage, instructions, status } = props;
+  const [pending, startTransition] = useTransition();
+  const { label, icon: StatusIcon, chip, card } = STATUS[status];
+  const when = formatTime(time);
+  const logged = status === "taken" || status === "skipped";
+
+  function log(next: "taken" | "skipped" | "clear") {
+    startTransition(async () => {
+      const result = await logDoseAction({ medicationId, scheduledFor, status: next });
+      if (result.ok) toast.success(`${name}: ${result.message}`);
+      else toast.error(result.message ?? "That did not save. Try again.");
+    });
+  }
+
+  return (
+    <li className={`flex flex-col gap-3 rounded-2xl border-2 p-4 ${card}`} aria-busy={pending}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-lg font-extrabold">{when}</p>
+        <p className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.9rem] font-bold ${chip}`}>
+          <StatusIcon aria-hidden="true" className="size-4" strokeWidth={2.5} />
+          {label}
+        </p>
+      </div>
+      <div>
+        <h3 className="text-xl font-extrabold">{name}</h3>
+        {dosage || instructions ? (
+          <p className="text-muted-foreground">{[dosage, instructions].filter(Boolean).join(", ")}</p>
+        ) : null}
+      </div>
+      {logged ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={pending}
+          onClick={() => log("clear")}
+          aria-label={`Undo: ${name} at ${when} was marked as ${status}`}
+          className="self-start"
+        >
+          <Undo2 aria-hidden="true" />
+          Undo
+        </Button>
+      ) : (
+        <div className="grid grid-cols-[1fr_auto] gap-2">
+          <Button
+            type="button"
+            disabled={pending}
+            onClick={() => log("taken")}
+            aria-label={`Mark ${name} at ${when} as taken`}
+          >
+            <Check aria-hidden="true" strokeWidth={3} />
+            Taken
+          </Button>
+          <Button
+            type="button"
+            variant="quiet"
+            disabled={pending}
+            onClick={() => log("skipped")}
+            aria-label={`Mark ${name} at ${when} as skipped`}
+          >
+            Skip
+          </Button>
+        </div>
+      )}
+    </li>
+  );
+}

@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--well);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--well);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--well);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-well: var(--well);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-alarm-soft: var(--alarm-soft);
+  --font-sans: var(--font-atkinson), Verdana, system-ui, sans-serif;
+  --font-heading: var(--font-atkinson), Verdana, system-ui, sans-serif;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+}
+
+/*
+ * Palette drawn from the pharmacy counter: paper-bag sage, bottle green,
+ * amber vial, and a warning red reserved for missed doses.
+ */
+:root {
+  --background: #eef3ee;
+  --foreground: #12261e;
+  --card: #ffffff;
+  --well: #e0e9e2;
+  --primary: #17513c;
+  --primary-foreground: #ffffff;
+  --muted-foreground: #40544a;
+  --border: #b9cabf;
+  --input: #6f8579;
+  --ring: #0b4dcc;
+  --amber: #f2b33d;
+  --amber-soft: #fdf0d2;
+  --leaf-soft: #d9eedf;
+  --destructive: #a8231b;
+  --alarm-soft: #fbe3e0;
+  --radius: 1rem;
+}
+
+/* 18px base so every rem-sized control is comfortably large. */
+html {
+  font-size: 112.5%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* "Larger text" preference, set on the signed-in shell. */
+html:has([data-text-size="large"]) {
+  font-size: 131.25%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background font-sans text-foreground;
+    line-height: 1.55;
+  }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+}
+
+/* The compartments of the daily organiser are recessed, like a pill box. */
+.well {
+  background: var(--well);
+  box-shadow:
+    inset 0 2px 4px rgb(18 38 30 / 0.14),
+    inset 0 -1px 0 rgb(255 255 255 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
