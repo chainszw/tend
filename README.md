@@ -8,10 +8,38 @@ has been missed.
 
 Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Management Platform*.
 
+## What makes Tend different
+
+Most medication apps stop at a list and a reminder. Tend does those well, and simply, and
+then adds four things built for an older person who may not type, may not read English and
+may not trust small print:
+
+1. **🩺 An interactive 3D home health pod.** A working prototype of a low-cost home station
+   (blood pressure cuff, pulse oximeter, thermometer, scale) that you can power on, use,
+   listen to and open up in the browser. Its readings flow straight into the family's
+   Health page. [Details](#tend-home-station-the-interactive-3d-pod)
+2. **📷 A prescription scanner.** Point the phone camera at a paper prescription and the
+   medicines appear as a checked, editable list: no typing out drug names and doses.
+   [Details](#prescription-scanner-photo-to-medicine-list)
+3. **🗣️ Multilingual voice, in and out.** Speak instead of typing, and hear answers, steps
+   and the day's doses read aloud, in English or Hindi (beta). One switch changes the
+   words on screen, the voice and the AI's answers.
+   [Details](#voice-and-language-english-and-hindi-beta)
+4. **🖼️ AI that understands pictures and answers in plain words.** A vision model reads
+   handwritten or printed prescriptions, and a grounded Care Companion chat answers
+   questions about *this* family's medicines, visits and readings, typed or spoken, and
+   can read its replies aloud. [Details](#care-companion-ai-chat-you-can-talk-to)
+
+Everything else is deliberately plain: one shared family, a pill-organiser home screen with
+one big **Taken** button, a simple medicine list, doctor visits, adherence numbers and email
+reminders. Big text, few choices, nothing to learn.
+
 ## Contents
 
+- [What makes Tend different](#what-makes-tend-different)
 - [How it meets the challenge](#how-it-meets-the-challenge)
-- [Features](#features)
+- [Standout features](#standout-features)
+- [The essentials, kept simple](#the-essentials-kept-simple)
 - [How Adaption AI is used](#how-adaption-ai-is-used)
 - [Google services](#google-services)
 - [Accessibility](#accessibility)
@@ -33,7 +61,87 @@ Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Manag
 | Go beyond a reminder app | Prescription import by camera, a grounded Care Companion, AI visit preparation, weekly family updates, health readings, a home device prototype, and voice. |
 | Elder stays at the centre | Larger text by default for the elder, read-aloud on key screens, one-tap dose buttons, and every change by family or caretakers is listed with their name. |
 
-## Features
+## Standout features
+
+These are what set Tend apart.
+
+### Tend Home Station: the interactive 3D pod
+Many older people already own a blood pressure monitor, but the numbers stay on its screen
+and never reach the family. The Tend Home Station shows how one cheap, voice-guided unit
+could fix that.
+
+`/device` (linked from the homepage as "Try the Tend device") is a working 3D prototype of a
+low-cost home health station: an upper-arm blood pressure cuff, a fingertip pulse oximeter,
+a thermometer and an optional wireless scale around one small unit with a screen, three
+large buttons and a voice.
+
+- Power it on, pick a measurement, follow the spoken steps, read the result in plain words
+  and save it. The screen is real HTML placed on the 3D model, so it works with a keyboard
+  and a screen reader; the same controls are repeated as ordinary buttons below.
+- **Show inside** opens the device and lists every part, what it does and a rough cost in
+  rupees.
+- Signed in, a saved reading goes to the family. Signed out, it is a demo and nothing
+  is stored.
+- Built with React Three Fiber and drei from original geometry (no downloaded models).
+
+The readings are simulated. This is a design prototype, not a manufactured or clinically
+validated medical device.
+
+### Prescription scanner: photo to medicine list
+Typing a list of drug names, strengths and timings is the hardest part of setting up any
+medicine app, and the most error-prone for an older person.
+
+Instead of typing, **Scan with camera** takes a photo of a paper prescription or medicine
+label, or the text can be pasted. Adaption AI reads it into
+structured medicines. Nothing is saved until a person has reviewed and corrected every line.
+
+- The photo is resized in the browser (`lib/image-resize.ts`) so it uploads fast on a
+  mobile connection.
+- Google's **Gemma** vision model, served through Adaption, transcribes the prescription,
+  then a second step turns the text into dose, times and days, validated with zod.
+- The text read from the photo is kept in an editable box (**Back to the text**), so a
+  family member can check and fix it before saving. Pasted text works the same way when
+  there is no camera.
+
+### Voice and language: English, and Hindi (beta)
+Many elders in India are more comfortable speaking than typing, and in Hindi than in
+English. Tend lets them talk to the app and listen to it.
+
+One language setting controls the page words, the speaking voice, listening, and the
+language the Care Companion answers in.
+
+- **English** is complete.
+- **हिन्दी is in beta** and is labelled *Beta* wherever the language is chosen. The shell,
+  navigation, Settings, Today and Ask are translated; Medicines, Visits, Health and Family
+  are still in English. On the Home Station the spoken steps and voice commands are in
+  Hindi, while the on-screen text is English.
+- **Speaking** uses the browser's `speechSynthesis`, choosing the most natural installed
+  voice (neural and Google voices first, then an Indian accent). Only one thing speaks at a
+  time and it can be stopped at once.
+- **Listening** uses the browser's `SpeechRecognition` (`en-IN` or `hi-IN`). On Ask the
+  words go into the question box to be checked; they are never sent automatically. On the
+  device a reading is saved only after "yes" / "हाँ" or the Save button.
+- No audio is stored, and no speech model or paid service is added. Voice quality depends
+  on the voices installed on the device, and listening works best in Chrome.
+
+### Care Companion: AI chat you can talk to
+A single chat that answers questions such as "What do I still need to take today?" in plain
+language. It is given the family's own medicines, today's doses, adherence, visits and
+health readings, and is grounded on a care-guidance dataset. It can be typed to or spoken
+to, and can read its answers aloud. It never changes a dose and sends emergencies to 112.
+
+- **Grounded, not generic.** Each answer is built from the family's own record plus a
+  care-guidance dataset adapted and evaluated with Adaption, not from the open web.
+- **Voice both ways.** The mic fills the question box (in English or Hindi) so it can be
+  checked before sending; a speaker button reads each answer aloud, or every answer
+  automatically.
+- **Pictures too.** The same Gemma vision model reads prescription photos, so the
+  Companion can talk about medicines that were added just by taking a picture.
+
+## The essentials, kept simple
+
+The core of the challenge, done plainly so that anyone in the family can use it on the
+first try.
 
 ### Family: one shared profile
 One family is created per older person. Whoever sets it up chooses their role (the elder,
@@ -57,11 +165,6 @@ Add a medicine with its dose, times of day, days of the week and optional start 
 dates. Medicines can be edited, paused (for example during a hospital stay), resumed or
 removed. The schedule logic is pure code in `lib/schedule.ts` and fully unit tested.
 
-### Prescription import: paste or scan
-Instead of typing, **Scan with camera** takes a photo of a paper prescription (it is
-shrunk in the browser first), or the text can be pasted. Adaption AI reads it into
-structured medicines. Nothing is saved until a person has reviewed and corrected every line.
-
 ### Adherence
 A dose that is not marked within an hour of its time counts as missed. The **This week**
 strip shows each of the last 7 days, the share of doses taken and the current streak of
@@ -82,12 +185,6 @@ Every 10 minutes a scheduled job checks every family and sends:
 Each member can turn their own reminder emails on or off on the Family page. Each reminder is claimed in a table with a unique key before it is sent, so a reminder can
 never be sent twice, even if the job runs twice.
 
-### Care Companion (Ask)
-A single chat that answers questions such as "What do I still need to take today?" in plain
-language. It is given the family's own medicines, today's doses, adherence, visits and
-health readings, and is grounded on a care-guidance dataset. It can be typed to or spoken
-to, and can read its answers aloud. It never changes a dose and sends emergencies to 112.
-
 ### Family page
 A short list of who is in the family, the five most recent changes with the name of who
 made them, a **weekly update** that turns the adherence numbers into a few warm sentences
@@ -98,42 +195,6 @@ The Health page lists blood pressure, blood oxygen, temperature and weight readi
 plain-word assessments. Readings arrive from the Tend Home Station or from **Enter a reading
 yourself**. A **Smart watch** card is marked *Coming soon*. Saved readings also appear in
 the activity list and in what the Care Companion can talk about.
-
-### Tend Home Station (interactive device prototype)
-`/device` (linked from the homepage as "Try the Tend device") is a working 3D prototype of a
-low-cost home health station: an upper-arm blood pressure cuff, a fingertip pulse oximeter,
-a thermometer and an optional wireless scale around one small unit with a screen, three
-large buttons and a voice.
-
-- Power it on, pick a measurement, follow the spoken steps, read the result in plain words
-  and save it. The screen is real HTML placed on the 3D model, so it works with a keyboard
-  and a screen reader; the same controls are repeated as ordinary buttons below.
-- **Show inside** opens the device and lists every part, what it does and a rough cost in
-  rupees.
-- Signed in, a saved reading goes to the family. Signed out, it is a demo and nothing
-  is stored.
-- Built with React Three Fiber and drei from original geometry (no downloaded models).
-
-The readings are simulated. This is a design prototype, not a manufactured or clinically
-validated medical device.
-
-### Voice and language: English, and Hindi (beta)
-One language setting controls the page words, the speaking voice, listening, and the
-language the Care Companion answers in.
-
-- **English** is complete.
-- **हिन्दी is in beta** and is labelled *Beta* wherever the language is chosen. The shell,
-  navigation, Settings, Today and Ask are translated; Medicines, Visits, Health and Family
-  are still in English. On the Home Station the spoken steps and voice commands are in
-  Hindi, while the on-screen text is English.
-- **Speaking** uses the browser's `speechSynthesis`, choosing the most natural installed
-  voice (neural and Google voices first, then an Indian accent). Only one thing speaks at a
-  time and it can be stopped at once.
-- **Listening** uses the browser's `SpeechRecognition` (`en-IN` or `hi-IN`). On Ask the
-  words go into the question box to be checked; they are never sent automatically. On the
-  device a reading is saved only after "yes" / "हाँ" or the Save button.
-- No audio is stored, and no speech model or paid service is added. Voice quality depends
-  on the voices installed on the device, and listening works best in Chrome.
 
 ### Settings
 The **Settings** button in the header has a text-size slider (90% to 160%, applied live and
