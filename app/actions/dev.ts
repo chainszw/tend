@@ -4,12 +4,13 @@ import { randomInt } from "node:crypto";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { devAccessEnabled } from "@/lib/dev";
+import { DEMO_CIRCLE_CODE } from "@/lib/dev-mode";
 import { hashPasscode } from "@/lib/passcode";
 import { sealPasscode } from "@/lib/passcode-vault";
-import { createSession } from "@/lib/session";
+import { clearSession, createSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 
-const DEV_CODE = "DEMO-0000";
+const DEV_CODE = DEMO_CIRCLE_CODE;
 const DEV_TIMEZONE = "Asia/Kolkata";
 const DEV_MEMBERS: Record<Role, string> = {
   elder: "Asha Rao",
@@ -75,7 +76,7 @@ async function createDemoCircle(): Promise<string | null> {
   return circle.id;
 }
 
-/** Development only: signs straight into the demo circle as the chosen role. */
+/** Dev mode only: signs straight into the demo circle as the chosen role. */
 export async function devSignInAction(role: Role): Promise<void> {
   if (!devAccessEnabled() || !(role in DEV_MEMBERS)) notFound();
   const supabase = db();
@@ -104,4 +105,11 @@ export async function devSignInAction(role: Role): Promise<void> {
 
   await createSession({ circleId, memberId: member.id, name: member.name, role: member.role as Role });
   redirect("/circle");
+}
+
+/** Dev mode only: leaves the demo circle and returns to the landing page. */
+export async function devSignOutAction(): Promise<void> {
+  if (!devAccessEnabled()) notFound();
+  await clearSession();
+  redirect("/");
 }
