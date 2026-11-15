@@ -1,10 +1,39 @@
 "use client";
 
-import { useEffect, useId, useState, useTransition } from "react";
+import { useEffect, useId, useSyncExternalStore, useTransition } from "react";
 import { LogOut, Wrench, X } from "lucide-react";
 import { devOpenAction, devSignOutAction } from "@/app/actions/dev";
 import { DEV_ROLES, DEV_SCREENS } from "@/lib/dev-mode";
 import type { Role } from "@/lib/types";
+
+const OPEN_KEY = "tend_dev_open";
+const ROLE_KEY = "tend_dev_role";
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function read(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+/** Kept for the browser tab, so the panel stays open while jumping from screen to screen. */
+function write(key: string, value: string) {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    // Private windows may refuse storage; the panel then simply closes after a jump.
+  }
+  for (const listener of listeners) listener();
+}
 
 const FOCUS = "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring";
 
@@ -13,8 +42,10 @@ const FOCUS = "focus-visible:outline-none focus-visible:ring-4 focus-visible:rin
  * including the 3D device, without a circle code or passcode.
  */
 export function DevModePanel() {
-  const [open, setOpen] = useState(false);
-  const [role, setRole] = useState<Role>("family");
+  const open = useSyncExternalStore(subscribe, () => read(OPEN_KEY) === "1", () => false);
+  const storedRole = useSyncExternalStore(subscribe, () => read(ROLE_KEY), () => null);
+  const role: Role = DEV_ROLES.find((option) => option.role === storedRole)?.role ?? "family";
+  const setOpen = (value: boolean) => write(OPEN_KEY, value ? "1" : "0");
   const [pending, startTransition] = useTransition();
   const panelId = useId();
 
@@ -53,7 +84,7 @@ export function DevModePanel() {
                     name="dev-role"
                     value={option.role}
                     checked={role === option.role}
-                    onChange={() => setRole(option.role)}
+                    onChange={() => write(ROLE_KEY, option.role)}
                     className="sr-only"
                   />
                   {option.label}
@@ -95,7 +126,7 @@ export function DevModePanel() {
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpen(!open)}
         className={`flex min-h-12 items-center gap-2 rounded-full border-2 border-amber bg-amber-soft px-4 font-bold shadow-lg ${FOCUS}`}
       >
         {open ? <X aria-hidden="true" className="size-5" /> : <Wrench aria-hidden="true" className="size-5" />}
