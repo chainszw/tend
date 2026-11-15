@@ -99,3 +99,22 @@ export function splitForSpeech(text: string): string[] {
   if (current.trim()) chunks.push(current.trim());
   return chunks;
 }
+
+/** Plain words for why listening stopped. Empty = nothing to tell the person. */
+export function listeningError(code: string | undefined): string {
+  switch (code) {
+    case "aborted":
+      return "";
+    case "not-allowed":
+    case "service-not-allowed":
+      return "The microphone is blocked. Allow it in your browser settings, or carry on without it.";
+    case "no-speech":
+      return "I did not hear anything. Press the microphone and try again.";
+    case "audio-capture":
+      return "No microphone was found. You can carry on without it.";
+    case "network":
+      return "Voice needs Google Chrome and an internet connection. You can type instead.";
+    default:
+      return "I could not hear that. Try again, or carry on without it.";
+  }
+}

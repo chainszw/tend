@@ -27,6 +27,55 @@ export const readingSchema = z.discriminatedUnion("kind", [
 ]);
 
 export type ReadingInput = z.infer<typeof readingSchema>;
+
+/** Plain-word range message for each typed field. */
+const FIELD_HELP: Record<string, string> = {
+  systolic: "Enter the top number, between 60 and 260.",
+  diastolic: "Enter the bottom number, between 30 and 160.",
+  pulse: "Enter the pulse, between 30 and 220 beats a minute.",
+  spo2: "Enter the oxygen level, between 50 and 100.",
+  temperature_c: "Enter the temperature, between 30 and 45 °C.",
+  weight_kg: "Enter the weight, between 20 and 250 kg.",
+};
+
+const FIELDS_BY_KIND: Record<ReadingKind, readonly string[]> = {
+  bp: ["systolic", "diastolic", "pulse"],
+  spo2: ["spo2", "pulse"],
+  temp: ["temperature_c"],
+  weight: ["weight_kg"],
+};
+
+export type ManualReadingResult =
+  | { ok: true; reading: ReadingInput }
+  | { ok: false; fieldErrors: Record<string, string> };
+
+/** Turns what someone typed (strings) into a validated reading, with a message per bad field. */
+export function readingFromTyped(
+  kind: string,
+  typed: Readonly<Record<string, string | undefined>>,
+): ManualReadingResult {
+  if (!(READING_KINDS as readonly string[]).includes(kind)) {
+    return { ok: false, fieldErrors: { kind: "Choose what you measured." } };
+  }
+  const known = kind as ReadingKind;
+  const candidate: Record<string, unknown> = { kind: known, irregular: false };
+  const errors: Record<string, string> = {};
+  for (const field of FIELDS_BY_KIND[known]) {
+    const text = (typed[field] ?? "").trim().replace(",", ".");
+    const value = text === "" ? Number.NaN : Number(text);
+    if (Number.isFinite(value)) candidate[field] = value;
+    else errors[field] = FIELD_HELP[field];
+  }
+  if (Object.keys(errors).length > 0) return { ok: false, fieldErrors: errors };
+
+  const parsed = readingSchema.safeParse(candidate);
+  if (parsed.success) return { ok: true, reading: parsed.data };
+  for (const issue of parsed.error.issues) {
+    const field = String(issue.path[0] ?? "form");
+    errors[field] ??= FIELD_HELP[field] ?? "That does not look right.";
+  }
+  return { ok: false, fieldErrors: errors };
+}
 export type StoredReading = ReadingInput & { id: string; taken_at: string };
 
 export const KIND_LABELS: Record<ReadingKind, string> = {

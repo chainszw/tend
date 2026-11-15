@@ -74,8 +74,8 @@ export function describeAppointments(appointments: readonly RecordAppointment[])
     .join("\n");
 }
 
-/** Recent Home Station readings, newest first, for AI prompts. */
+/** Recent health readings, newest first, for AI prompts. */
 export function describeReadings(readings: readonly { text: string; when: string }[]): string {
-  if (readings.length === 0) return "No health readings have been recorded with the Tend device.";
+  if (readings.length === 0) return "No health readings have been recorded.";
   return readings.map((reading) => `- ${reading.text} (${reading.when})`).join("\n");
 }

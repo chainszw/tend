@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { stopSpeaking, useVoicePreferences } from "@/components/voice/voice-store";
-import { LANGUAGE_TAGS } from "@/lib/voice/language";
+import { LANGUAGE_TAGS, listeningError } from "@/lib/voice/language";
 
 /** The small part of the Web Speech recognition API this app uses. */
 interface RecognitionResult {
@@ -30,28 +30,21 @@ function recognitionConstructor(): RecognitionConstructor | null {
   return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition ?? null;
 }
 
-const subscribeNever = () => () => {};
-const canListenNow = () => recognitionConstructor() !== null;
-const notOnServer = () => false;
-
-/** Plain words for why listening stopped. Empty = nothing to tell the person. */
-export function listeningError(code: string | undefined): string {
-  switch (code) {
-    case "aborted":
-      return "";
-    case "not-allowed":
-    case "service-not-allowed":
-      return "The microphone is blocked. Allow it in your browser settings, or carry on without it.";
-    case "no-speech":
-      return "I did not hear anything. Press the microphone and try again.";
-    case "audio-capture":
-      return "No microphone was found. You can carry on without it.";
-    case "network":
-      return "Listening needs an internet connection. Try again, or carry on without it.";
-    default:
-      return "I could not hear that. Try again, or carry on without it.";
-  }
+/** Set once the browser's speech service has failed, so the mic stops promising it. */
+let serviceFailed = false;
+const failureListeners = new Set<() => void>();
+function markServiceFailed() {
+  serviceFailed = true;
+  failureListeners.forEach((listener) => listener());
 }
+const subscribeFailure = (listener: () => void) => {
+  failureListeners.add(listener);
+  return () => {
+    failureListeners.delete(listener);
+  };
+};
+const canListenNow = () => recognitionConstructor() !== null && !serviceFailed;
+const notOnServer = () => false;
 
 /**
  * Listens for one spoken sentence in the shared language. Words appear live in
@@ -60,13 +53,16 @@ export function listeningError(code: string | undefined): string {
  */
 export function useListening(onHeard: (transcript: string) => void) {
   const { language } = useVoicePreferences();
-  const canListen = useSyncExternalStore(subscribeNever, canListenNow, notOnServer);
+  const canListen = useSyncExternalStore(subscribeFailure, canListenNow, notOnServer);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const [heard, setHeard] = useState("");
   const [error, setError] = useState("");
   const recognition = useRef<Recognition | null>(null);
   const heardHandler = useRef(onHeard);
+  const retried = useRef(false);
+  const retryPending = useRef(false);
+  const startRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     heardHandler.current = onHeard;
@@ -79,6 +75,7 @@ export function useListening(onHeard: (transcript: string) => void) {
 
   const start = useCallback(() => {
     if (recognition.current) return;
+    if (!retryPending.current) retried.current = false;
     const Constructor = recognitionConstructor();
     if (!Constructor) return;
     const session = new Constructor();
@@ -96,11 +93,24 @@ export function useListening(onHeard: (transcript: string) => void) {
         setInterim(transcript);
       }
     };
-    session.onerror = (event) => setError(listeningError(event.error));
+    session.onerror = (event) => {
+      if (event.error === "network" && !retried.current) {
+        // One quiet retry: the speech service sometimes fails on the first try.
+        retried.current = true;
+        retryPending.current = true;
+        return;
+      }
+      if (event.error === "network") markServiceFailed();
+      setError(listeningError(event.error));
+    };
     session.onend = () => {
       recognition.current = null;
       setListening(false);
       setInterim("");
+      if (retryPending.current) {
+        retryPending.current = false;
+        startRef.current();
+      }
     };
     recognition.current = session;
     stopSpeaking();
@@ -114,6 +124,10 @@ export function useListening(onHeard: (transcript: string) => void) {
       setError(listeningError(undefined));
     }
   }, [language]);
+
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
 
   /** Finishes the sentence: what was heard so far is kept. */
   const finish = useCallback(() => recognition.current?.stop(), []);

@@ -105,6 +105,8 @@ Last updated: 2026-11-15 ~15:30 IST.
       `LanguageProvider`/`useT()` (client) or `messages(await pageLanguage())` (server), words in
       `lib/i18n.ts` (typed: Hindi must have every English key, `tests/i18n.test.ts`). Translated so
       far: shell, nav, Settings, Today, Ask. Medicines/Visits/Health/Family still English.
+- [x] Health page: "Enter a reading yourself" manual form (`addManualReadingAction`, pure
+      `readingFromTyped` in `lib/device/readings.ts`) + "Smart watch — Coming soon" placeholder card (UI only).
 - [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 

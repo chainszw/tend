@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   LANGUAGE_LABELS,
   isVoiceLanguage,
+  listeningError,
   pickVoice,
   speakable,
   splitForSpeech,
@@ -75,5 +76,18 @@ describe("splitForSpeech", () => {
 
   it("returns nothing for empty text", () => {
     expect(splitForSpeech("  ")).toEqual([]);
+  });
+});
+
+describe("listeningError", () => {
+  it("is silent when listening was cancelled", () => {
+    expect(listeningError("aborted")).toBe("");
+  });
+  it("points a network failure to Chrome and typing", () => {
+    expect(listeningError("network")).toMatch(/Chrome/);
+    expect(listeningError("network")).toMatch(/type/);
+  });
+  it("explains a blocked microphone", () => {
+    expect(listeningError("not-allowed")).toMatch(/blocked/);
   });
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Activity } from "lucide-react";
+import { HealthActions } from "@/components/circle/health-actions";
 import { buttonVariants } from "@/components/ui/button";
 import { listReadings } from "@/lib/data";
 import {
@@ -33,18 +34,21 @@ export default async function HealthPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-[40rem]">
           <h1 className="text-4xl font-extrabold">Health readings</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            Readings {circle.elder_name} takes with the Tend Home Station appear here for the
-            whole circle. In this prototype the device is a simulation.
+            Readings {circle.elder_name} takes appear here for the whole circle. Use the Tend Home
+            Station, or type a reading in yourself. In this prototype the device is a simulation.
           </p>
         </div>
-        <Link href="/device" className={buttonVariants({ size: "lg" })}>
-          <Activity aria-hidden="true" />
-          Open the Tend device
-        </Link>
+        <div className="flex w-full flex-col gap-2 sm:w-auto">
+          <Link href="/device" className={buttonVariants({ size: "lg" })}>
+            <Activity aria-hidden="true" />
+            Open the Tend device
+          </Link>
+          <HealthActions />
+        </div>
       </div>
 
       <section aria-labelledby="latest-heading">
@@ -87,7 +91,7 @@ export default async function HealthPage() {
         </h2>
         {readings.length === 0 ? (
           <p className="mt-3 text-lg text-muted-foreground">
-            Nothing has been recorded yet. Open the Tend device, take a measurement and press Save.
+            Nothing has been recorded yet. Open the Tend device and press Save, or enter a reading above.
           </p>
         ) : (
           <ul className="mt-3 flex flex-col gap-2">

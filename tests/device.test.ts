@@ -20,6 +20,7 @@ import {
   latestByKind,
   liveValue,
   readingFromRow,
+  readingFromTyped,
   readingSchema,
   simulateReading,
   spokenReading,
@@ -266,5 +267,34 @@ describe("bill of materials", () => {
     expect(all - base).toBe(450);
     expect(base).toBe(2395);
     expect(formatInr(base)).toBe("₹2,395");
+  });
+});
+
+describe("readingFromTyped", () => {
+  it("builds each kind from typed text", () => {
+    expect(readingFromTyped("bp", { systolic: "120", diastolic: "80", pulse: "70" })).toEqual({
+      ok: true,
+      reading: { kind: "bp", systolic: 120, diastolic: 80, pulse: 70, irregular: false },
+    });
+    expect(readingFromTyped("spo2", { spo2: "97", pulse: "72" }).ok).toBe(true);
+    expect(readingFromTyped("temp", { temperature_c: "36,8" })).toEqual({
+      ok: true,
+      reading: { kind: "temp", temperature_c: 36.8 },
+    });
+    expect(readingFromTyped("weight", { weight_kg: " 62.5 " }).ok).toBe(true);
+  });
+
+  it("reports a message for blank, non-numeric and out-of-range fields", () => {
+    const blank = readingFromTyped("bp", { systolic: "", diastolic: "80", pulse: "abc" });
+    expect(blank.ok).toBe(false);
+    if (!blank.ok) expect(Object.keys(blank.fieldErrors).sort()).toEqual(["pulse", "systolic"]);
+
+    const range = readingFromTyped("temp", { temperature_c: "98.6" });
+    expect(range.ok).toBe(false);
+    if (!range.ok) expect(range.fieldErrors.temperature_c).toMatch(/30 and 45/);
+  });
+
+  it("rejects an unknown kind", () => {
+    expect(readingFromTyped("sugar", {}).ok).toBe(false);
   });
 });
