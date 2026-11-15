@@ -8,7 +8,8 @@ import { hashPasscode } from "@/lib/passcode";
 import { openPasscode, sealPasscode } from "@/lib/passcode-vault";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { requireSession } from "@/lib/session";
-import { TEXT_SIZE_COOKIE } from "@/lib/preferences";
+import { LANGUAGE_COOKIE, TEXT_SIZE_COOKIE, clampTextSize } from "@/lib/preferences";
+import { isVoiceLanguage } from "@/lib/voice/language";
 import type { ActionState } from "@/lib/types";
 import { changePasscodeSchema, fieldErrors } from "@/lib/validation";
 
@@ -90,14 +91,27 @@ export async function setNotifyAction(notify: boolean): Promise<ActionState> {
   return { ok: true, message: notify ? "Email reminders turned on" : "Email reminders turned off" };
 }
 
-/** Remembers the reader's text-size choice for a year. */
-export async function setTextSizeAction(size: "normal" | "large"): Promise<void> {
+/** Remembers the reader's text-size choice (percent) for a year. */
+export async function setTextSizeAction(size: number): Promise<void> {
   await requireSession();
-  (await cookies()).set(TEXT_SIZE_COOKIE, size === "large" ? "large" : "normal", {
+  (await cookies()).set(TEXT_SIZE_COOKIE, String(clampTextSize(Number(size) || 0)), {
     path: "/",
     maxAge: 365 * 24 * 60 * 60,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
-  revalidatePath("/circle", "layout");
+}
+
+/**
+ * Remembers the page language for a year. A harmless display preference, so it needs no
+ * session: the public Home Station page uses the same switch.
+ */
+export async function setLanguageAction(language: string): Promise<void> {
+  if (!isVoiceLanguage(language)) return;
+  (await cookies()).set(LANGUAGE_COOKIE, language, {
+    path: "/",
+    maxAge: 365 * 24 * 60 * 60,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
 }

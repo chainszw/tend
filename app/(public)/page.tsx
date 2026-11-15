@@ -77,7 +77,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/create" className={buttonVariants({ size: "lg" })}>
-              Start a care circle
+              Create Family
             </Link>
             <Link href="/join" className={buttonVariants({ size: "lg", variant: "outline" })}>
               Join with a code

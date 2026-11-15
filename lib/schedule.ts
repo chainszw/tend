@@ -134,12 +134,25 @@ export function dayPartOf(time: string): DayPart {
   return "night";
 }
 
+const HINDI_DAY_PART: Record<DayPart, string> = {
+  morning: "सुबह",
+  afternoon: "दोपहर",
+  evening: "शाम",
+  night: "रात",
+};
+
 /** Formats `HH:MM` as a friendly 12-hour time such as "8:30 am". */
 export function formatTime(time: string): string {
+  return formatTimeIn(time, "en");
+}
+
+/** The same time in the page language: "8:30 am", or "सुबह 8:30 बजे" in Hindi. */
+export function formatTimeIn(time: string, lang: "en" | "hi"): string {
   const [hours, minutes] = time.split(":").map(Number);
-  const suffix = hours < 12 ? "am" : "pm";
   const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-  return `${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+  const clock = `${hour12}:${String(minutes).padStart(2, "0")}`;
+  if (lang === "hi") return `${HINDI_DAY_PART[dayPartOf(time)]} ${clock} बजे`;
+  return `${clock} ${hours < 12 ? "am" : "pm"}`;
 }
 
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;

@@ -3,6 +3,7 @@
 import { useId } from "react";
 import { Square, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/components/i18n/language-provider";
 import { useSpeech } from "@/components/voice/voice-store";
 
 interface ReadAloudProps {
@@ -14,7 +15,8 @@ interface ReadAloudProps {
 }
 
 /** Reads text aloud in the chosen language with the shared voice. Hidden where unsupported. */
-export function ReadAloud({ text, label = "Read this aloud", variant = "outline", speechId }: ReadAloudProps) {
+export function ReadAloud({ text, label, variant = "outline", speechId }: ReadAloudProps) {
+  const t = useT();
   const ownId = useId();
   const { supported, speaking, speak, stop } = useSpeech(speechId ?? ownId);
 
@@ -28,7 +30,7 @@ export function ReadAloud({ text, label = "Read this aloud", variant = "outline"
       aria-pressed={speaking}
     >
       {speaking ? <Square aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
-      {speaking ? "Stop reading" : label}
+      {speaking ? t.stopReading : (label ?? t.readAloud)}
       {speaking ? (
         <span aria-hidden="true" className="ml-1 flex items-end gap-0.5">
           {[0, 150, 300].map((delay) => (

@@ -1,6 +1,6 @@
 /** Formats an instant as a readable date and time in a time zone. */
-export function formatDateTime(iso: string, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-IN", {
+export function formatDateTime(iso: string, timeZone: string, locale = "en-IN"): string {
+  return new Intl.DateTimeFormat(locale, {
     timeZone,
     weekday: "long",
     day: "numeric",
@@ -11,8 +11,8 @@ export function formatDateTime(iso: string, timeZone: string): string {
 }
 
 /** Formats a `YYYY-MM-DD` date as, for example, "Sunday, 15 November". */
-export function formatLongDate(date: string): string {
-  return new Intl.DateTimeFormat("en-IN", {
+export function formatLongDate(date: string, locale = "en-IN"): string {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: "UTC",
     weekday: "long",
     day: "numeric",
@@ -21,8 +21,8 @@ export function formatLongDate(date: string): string {
 }
 
 /** Short weekday name ("Mon") for a `YYYY-MM-DD` date. */
-export function formatWeekday(date: string): string {
-  return new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", weekday: "short" }).format(
+export function formatWeekday(date: string, locale = "en-IN"): string {
+  return new Intl.DateTimeFormat(locale, { timeZone: "UTC", weekday: "short" }).format(
     new Date(`${date}T00:00:00Z`),
   );
 }

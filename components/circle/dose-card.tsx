@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { logDoseAction } from "@/app/actions/medications";
 import { Button } from "@/components/ui/button";
 import type { DoseStatus } from "@/lib/adherence";
-import { formatTime } from "@/lib/schedule";
+import { useLang, useT } from "@/components/i18n/language-provider";
+import { formatTimeIn } from "@/lib/schedule";
 
 export interface DoseCardProps {
   medicationId: string;
@@ -19,26 +20,28 @@ export interface DoseCardProps {
 }
 
 const STATUS = {
-  taken: { label: "Taken", icon: Check, chip: "bg-primary text-primary-foreground", card: "border-primary bg-leaf-soft" },
-  skipped: { label: "Skipped", icon: CircleSlash, chip: "bg-well text-foreground", card: "border-border bg-card" },
-  missed: { label: "Not marked yet", icon: TriangleAlert, chip: "bg-destructive text-white", card: "border-destructive bg-card" },
-  due: { label: "Due now", icon: AlarmClock, chip: "bg-amber text-foreground", card: "border-amber bg-amber-soft" },
-  later: { label: "Later", icon: Clock3, chip: "bg-well text-foreground", card: "border-border bg-card" },
+  taken: { icon: Check, chip: "bg-primary text-primary-foreground", card: "border-primary bg-leaf-soft" },
+  skipped: { icon: CircleSlash, chip: "bg-well text-foreground", card: "border-border bg-card" },
+  missed: { icon: TriangleAlert, chip: "bg-destructive text-white", card: "border-destructive bg-card" },
+  due: { icon: AlarmClock, chip: "bg-amber text-foreground", card: "border-amber bg-amber-soft" },
+  later: { icon: Clock3, chip: "bg-well text-foreground", card: "border-border bg-card" },
 } as const;
 
 /** One dose in the organiser, with large Taken / Skip buttons. */
 export function DoseCard(props: DoseCardProps) {
   const { medicationId, scheduledFor, time, name, dosage, instructions, status } = props;
   const [pending, startTransition] = useTransition();
-  const { label, icon: StatusIcon, chip, card } = STATUS[status];
-  const when = formatTime(time);
+  const t = useT();
+  const { icon: StatusIcon, chip, card } = STATUS[status];
+  const label = t.status[status];
+  const when = formatTimeIn(time, useLang());
   const logged = status === "taken" || status === "skipped";
 
   function log(next: "taken" | "skipped" | "clear") {
     startTransition(async () => {
       const result = await logDoseAction({ medicationId, scheduledFor, status: next });
-      if (result.ok) toast.success(`${name}: ${result.message}`);
-      else toast.error(result.message ?? "That did not save. Try again.");
+      if (result.ok) toast.success(`${name}: ${t.doseSaved[next]}`);
+      else toast.error(t.doseFailed);
     });
   }
 
@@ -64,11 +67,11 @@ export function DoseCard(props: DoseCardProps) {
           size="sm"
           disabled={pending}
           onClick={() => log("clear")}
-          aria-label={`Undo: ${name} at ${when} was marked as ${status}`}
+          aria-label={t.undoLabel(name, when)}
           className="self-start"
         >
           <Undo2 aria-hidden="true" />
-          Undo
+          {t.undo}
         </Button>
       ) : (
         <div className="grid grid-cols-[1fr_auto] gap-2">
@@ -76,19 +79,19 @@ export function DoseCard(props: DoseCardProps) {
             type="button"
             disabled={pending}
             onClick={() => log("taken")}
-            aria-label={`Mark ${name} at ${when} as taken`}
+            aria-label={t.markTaken(name, when)}
           >
             <Check aria-hidden="true" strokeWidth={3} />
-            Taken
+            {t.taken}
           </Button>
           <Button
             type="button"
             variant="quiet"
             disabled={pending}
             onClick={() => log("skipped")}
-            aria-label={`Mark ${name} at ${when} as skipped`}
+            aria-label={t.markSkipped(name, when)}
           >
-            Skip
+            {t.skip}
           </Button>
         </div>
       )}

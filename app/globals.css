@@ -64,11 +64,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-/* "Larger text" preference, set on the signed-in shell. */
-html:has([data-text-size="large"]) {
-  font-size: 131.25%;
-}
-
 @layer base {
   * {
     @apply border-border;

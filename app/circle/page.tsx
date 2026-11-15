@@ -1,25 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlarmClock, CalendarDays, CircleCheck, TriangleAlert } from "lucide-react";
+import {
+  AlarmClock,
+  CalendarDays,
+  CircleCheck,
+  TriangleAlert,
+} from "lucide-react";
 import { DoseCard } from "@/components/circle/dose-card";
 import { ReadAloud } from "@/components/circle/read-aloud";
 import { WeekStrip } from "@/components/circle/week-strip";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDateTime, formatLongDate } from "@/lib/format";
-import { DAY_PARTS, DAY_PART_LABELS, dayPartOf, localTimeString } from "@/lib/schedule";
+import { dateLocale, messages, type Messages } from "@/lib/i18n";
+import { pageLanguage } from "@/lib/i18n-server";
+import { DAY_PARTS, dayPartOf, localTimeString } from "@/lib/schedule";
 import { requireSession } from "@/lib/session";
 import { loadSnapshot, type CareSnapshot } from "@/lib/snapshot";
 import { spokenDaySummary } from "@/lib/speech";
 
 export const metadata: Metadata = { title: "Today" };
 
-function greeting(hour: number): string {
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
-
-function StatusBanner({ slots }: { slots: CareSnapshot["slots"] }) {
+function StatusBanner({
+  slots,
+  t,
+}: {
+  slots: CareSnapshot["slots"];
+  t: Messages;
+}) {
   const due = slots.filter((slot) => slot.status === "due");
   const missed = slots.filter((slot) => slot.status === "missed");
   if (missed.length > 0) {
@@ -27,8 +34,8 @@ function StatusBanner({ slots }: { slots: CareSnapshot["slots"] }) {
       <p className="flex items-start gap-3 rounded-2xl bg-alarm-soft p-4 text-lg font-bold text-destructive">
         <TriangleAlert aria-hidden="true" className="mt-0.5 size-6 shrink-0" />
         {missed.length === 1
-          ? `${missed[0].med.name} has not been marked as taken. If it was taken, mark it below.`
-          : `${missed.length} doses have not been marked as taken. If they were taken, mark them below.`}
+          ? t.missedOne(missed[0].med.name)
+          : t.missedMany(missed.length)}
       </p>
     );
   }
@@ -36,26 +43,33 @@ function StatusBanner({ slots }: { slots: CareSnapshot["slots"] }) {
     return (
       <p className="flex items-start gap-3 rounded-2xl bg-amber-soft p-4 text-lg font-bold">
         <AlarmClock aria-hidden="true" className="mt-0.5 size-6 shrink-0" />
-        {due.length === 1 ? `It is time for ${due[0].med.name}.` : `${due.length} medicines are due now.`}
+        {due.length === 1 ? t.dueOne(due[0].med.name) : t.dueMany(due.length)}
       </p>
     );
   }
-  const done = slots.every((slot) => slot.status === "taken" || slot.status === "skipped");
+  const done = slots.every(
+    (slot) => slot.status === "taken" || slot.status === "skipped",
+  );
   return (
     <p className="flex items-start gap-3 rounded-2xl bg-leaf-soft p-4 text-lg font-bold text-primary">
       <CircleCheck aria-hidden="true" className="mt-0.5 size-6 shrink-0" />
-      {done ? "Everything for today is done." : "Nothing is due right now. The next dose is listed below."}
+      {done ? t.allDone : t.nothingDue}
     </p>
   );
 }
 
 export default async function TodayPage() {
   const session = await requireSession();
-  const snapshot = await loadSnapshot(session.circleId);
+  const [snapshot, lang] = await Promise.all([
+    loadSnapshot(session.circleId),
+    pageLanguage(),
+  ]);
+  const t = messages(lang);
+  const locale = dateLocale(lang);
   const { circle, slots, today, now } = snapshot;
   const isElder = session.role === "elder";
   const hour = Number(localTimeString(now, circle.timezone).slice(0, 2));
-  const dateLabel = formatLongDate(today);
+  const dateLabel = formatLongDate(today, locale);
   const nextVisit = snapshot.appointments[0];
 
   return (
@@ -63,42 +77,57 @@ export default async function TodayPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-4xl font-extrabold">
-            {isElder ? `${greeting(hour)}, ${session.name}` : `${circle.elder_name}'s day`}
+            {isElder
+              ? t.greeting(hour, session.name)
+              : t.eldersDay(circle.elder_name)}
           </h1>
           <p className="mt-1 text-xl text-muted-foreground">{dateLabel}</p>
         </div>
-        <ReadAloud text={spokenDaySummary(dateLabel, slots)} label="Read my day aloud" />
+        <ReadAloud
+          text={spokenDaySummary(dateLabel, slots, lang)}
+          label={t.readMyDay}
+        />
       </div>
 
       {slots.length === 0 ? (
         <section className="rounded-2xl border-2 border-dashed border-input bg-card p-8">
-          <h2 className="text-2xl font-extrabold">No medicines are scheduled today</h2>
+          <h2 className="text-2xl font-extrabold">{t.noMedsTitle}</h2>
           <p className="mt-2 max-w-[38rem] text-muted-foreground">
-            Add a medicine by hand, or paste a prescription and let Tend read it into a schedule.
+            {t.noMedsBody}
           </p>
-          <Link href="/circle/medications" className={buttonVariants({ className: "mt-5" })}>
-            Add medicines
+          <Link
+            href="/circle/medications"
+            className={buttonVariants({ className: "mt-5" })}
+          >
+            {t.addMedicines}
           </Link>
         </section>
       ) : (
         <>
           <div role="status">
-            <StatusBanner slots={slots} />
+            <StatusBanner slots={slots} t={t} />
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {DAY_PARTS.map((part) => {
-              const doses = slots.filter((slot) => dayPartOf(slot.time) === part);
+              const doses = slots.filter(
+                (slot) => dayPartOf(slot.time) === part,
+              );
               return (
                 <section
                   key={part}
                   aria-labelledby={`part-${part}`}
                   className="well flex flex-col gap-3 rounded-2xl p-3"
                 >
-                  <h2 id={`part-${part}`} className="px-1 pt-1 text-xl font-extrabold">
-                    {DAY_PART_LABELS[part]}
+                  <h2
+                    id={`part-${part}`}
+                    className="px-1 pt-1 text-xl font-extrabold"
+                  >
+                    {t.dayParts[part]}
                   </h2>
                   {doses.length === 0 ? (
-                    <p className="px-1 pb-2 text-muted-foreground">Nothing scheduled</p>
+                    <p className="px-1 pb-2 text-muted-foreground">
+                      {t.nothingScheduled}
+                    </p>
                   ) : (
                     <ul className="flex flex-col gap-3">
                       {doses.map((slot) => (
@@ -123,29 +152,41 @@ export default async function TodayPage() {
       )}
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <WeekStrip summary={snapshot.adherence} today={today} />
-        <section aria-labelledby="visit-heading" className="rounded-2xl border-2 border-border bg-card p-5">
+        <WeekStrip summary={snapshot.adherence} today={today} lang={lang} />
+        <section
+          aria-labelledby="visit-heading"
+          className="rounded-2xl border-2 border-border bg-card p-5"
+        >
           <h2 id="visit-heading" className="text-2xl font-extrabold">
-            Next doctor visit
+            {t.nextVisit}
           </h2>
           {nextVisit ? (
             <>
               <p className="mt-3 flex items-start gap-2 text-lg font-bold">
-                <CalendarDays aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-primary" />
-                {formatDateTime(nextVisit.starts_at, circle.timezone)}
+                <CalendarDays
+                  aria-hidden="true"
+                  className="mt-0.5 size-6 shrink-0 text-primary"
+                />
+                {formatDateTime(nextVisit.starts_at, circle.timezone, locale)}
               </p>
               <p className="mt-1 text-muted-foreground">
-                {[nextVisit.doctor, nextVisit.specialty, nextVisit.location].filter(Boolean).join(", ")}
+                {[nextVisit.doctor, nextVisit.specialty, nextVisit.location]
+                  .filter(Boolean)
+                  .join(", ")}
               </p>
             </>
           ) : (
-            <p className="mt-3 text-muted-foreground">No visits are booked.</p>
+            <p className="mt-3 text-muted-foreground">{t.noVisits}</p>
           )}
           <Link
             href="/circle/appointments"
-            className={buttonVariants({ variant: "outline", size: "sm", className: "mt-4" })}
+            className={buttonVariants({
+              variant: "outline",
+              size: "sm",
+              className: "mt-4",
+            })}
           >
-            {nextVisit ? "See all visits" : "Add a visit"}
+            {nextVisit ? t.seeAllVisits : t.addVisit}
           </Link>
         </section>
       </div>

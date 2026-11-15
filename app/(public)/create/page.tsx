@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CreateForm } from "@/components/public/create-form";
 
-export const metadata: Metadata = { title: "Start a care circle" };
+export const metadata: Metadata = { title: "Create Family" };
 
 export default function CreatePage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-5 pb-16 pt-6">
-      <h1 className="text-4xl font-extrabold">Start a care circle</h1>
+      <h1 className="text-4xl font-extrabold">Create Family</h1>
       <p className="mt-3 text-lg text-muted-foreground">
         A circle holds one person&apos;s medicines and appointments. You will get a code to share
         with family and caretakers.

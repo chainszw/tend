@@ -79,4 +79,12 @@ describe("spokenDaySummary", () => {
     expect(spokenDaySummary("Sunday", done)).toContain("Everything for today is done.");
     expect(spokenDaySummary("Sunday", [])).toContain("no medicines scheduled");
   });
+
+  it("speaks Hindi when asked, keeping medicine names as written", () => {
+    const text = spokenDaySummary("रविवार, 15 नवंबर", slots, "hi");
+    expect(text).toContain("आज रविवार, 15 नवंबर है।");
+    expect(text).toContain("आज बाद में: Metformin, 500 mg, शाम 8:00 बजे।");
+    expect(text).toContain("1 खुराक ली जा चुकी है।");
+    expect(spokenDaySummary("रविवार", [], "hi")).toContain("कोई दवा तय नहीं");
+  });
 });

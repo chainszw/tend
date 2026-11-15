@@ -99,6 +99,12 @@ Last updated: 2026-11-15 ~15:30 IST.
       Device: Hindi prompts/commands in `lib/device/machine.ts` + `readings.ts`, "Speak to the
       device" button on every screen, save only after yes/Save. Tested in headless Chrome with a
       simulated recogniser; real mic input and audio quality NOT yet checked by ear.
+- [x] Ask page is a single chat card (header language switch + speaker toggle, mic/send composer).
+- [x] Header "Settings" menu (`components/circle/settings-menu.tsx`): text size + app language.
+      One language for page AND voice: cookie `tend_lang` (`setLanguageAction`, `resolveLanguage`),
+      `LanguageProvider`/`useT()` (client) or `messages(await pageLanguage())` (server), words in
+      `lib/i18n.ts` (typed: Hindi must have every English key, `tests/i18n.test.ts`). Translated so
+      far: shell, nav, Settings, Today, Ask. Medicines/Visits/Health/Family still English.
 - [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 

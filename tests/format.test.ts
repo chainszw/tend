@@ -67,14 +67,21 @@ describe("describeDays", () => {
 });
 
 describe("resolveTextSize", () => {
-  it("uses the saved choice when there is one", () => {
-    expect(resolveTextSize("large", "family")).toBe("large");
-    expect(resolveTextSize("normal", "elder")).toBe("normal");
+  it("uses the saved percentage, kept within the allowed range", () => {
+    expect(resolveTextSize("125", "family")).toBe(125);
+    expect(resolveTextSize("40", "elder")).toBe(90);
+    expect(resolveTextSize("999", "elder")).toBe(160);
+    expect(resolveTextSize("122", "family")).toBe(120);
   });
 
-  it("defaults to large text for the person being cared for", () => {
-    expect(resolveTextSize(undefined, "elder")).toBe("large");
-    expect(resolveTextSize(undefined, "caretaker")).toBe("normal");
-    expect(resolveTextSize("huge", "family")).toBe("normal");
+  it("understands the older large/normal values", () => {
+    expect(resolveTextSize("large", "family")).toBe(130);
+    expect(resolveTextSize("normal", "elder")).toBe(110);
+  });
+
+  it("defaults to larger text for the person being cared for", () => {
+    expect(resolveTextSize(undefined, "elder")).toBe(130);
+    expect(resolveTextSize(undefined, "caretaker")).toBe(110);
+    expect(resolveTextSize("huge", "family")).toBe(110);
   });
 });

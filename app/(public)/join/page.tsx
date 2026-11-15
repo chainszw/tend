@@ -20,7 +20,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
       <p className="mt-6">
         Setting this up for the first time?{" "}
         <Link href="/create" className="font-bold text-primary underline underline-offset-4">
-          Start a care circle
+          Create Family
         </Link>
       </p>
     </div>
