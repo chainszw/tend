@@ -10,6 +10,7 @@ import {
   normaliseCircleCode,
   verifyPasscode,
 } from "@/lib/passcode";
+import { sealPasscode } from "@/lib/passcode-vault";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { clearSession, createSession } from "@/lib/session";
 import type { ActionState, Role } from "@/lib/types";
@@ -57,6 +58,7 @@ export async function createCircleAction(
         elder_name: isElder ? input.yourName : input.elderName,
         elder_email: isElder ? (input.yourEmail ?? input.elderEmail) : input.elderEmail,
         passcode_hash: passcodeHash,
+        passcode_enc: sealPasscode(input.passcode),
         timezone: input.timezone,
       })
       .select("id")

@@ -1,11 +1,55 @@
 import type { Metadata } from "next";
 import { Info } from "lucide-react";
 import { CompanionChat } from "@/components/circle/companion-chat";
+import { Disclosure } from "@/components/circle/disclosure";
 import { adaptionConfigured, stackSlug } from "@/lib/adaption";
+import { adaptionEvaluation } from "@/lib/adaption-eval";
 import { requireSession } from "@/lib/session";
 import { loadSnapshot } from "@/lib/snapshot";
 
 export const metadata: Metadata = { title: "Ask the Care Companion" };
+
+function AiDetails() {
+  const evaluation = adaptionEvaluation();
+  const evaluated = evaluation.gradeAfter !== null || evaluation.scoreAfter !== null;
+  return (
+    <Disclosure summary="How the AI helper is prepared">
+      <div className="rounded-2xl border-2 border-border bg-card p-5">
+        <p className="text-muted-foreground">
+          The Care Companion runs on Adaption AI. Its care guidance comes from a
+          question-and-answer dataset written for older adults, which Adaption Adaptive Data
+          cleaned, rephrased and graded before use.
+        </p>
+        <dl className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          <div>
+            <dt className="font-bold">AI helper</dt>
+            <dd>{adaptionConfigured() ? "Connected" : "Not connected yet"}</dd>
+          </div>
+          <div>
+            <dt className="font-bold">Answers grounded on the dataset</dt>
+            <dd>{stackSlug() ? "Yes, through an Adaption Inference Stack" : "Not yet"}</dd>
+          </div>
+          <div>
+            <dt className="font-bold">Guidance examples</dt>
+            <dd>{evaluation.rows > 0 ? evaluation.rows : "Not processed yet"}</dd>
+          </div>
+          <div>
+            <dt className="font-bold">Quality grade</dt>
+            <dd>
+              {evaluated
+                ? `${evaluation.gradeBefore ?? "?"} before, ${evaluation.gradeAfter ?? "?"} after adapting${
+                    evaluation.improvementPercent === null
+                      ? ""
+                      : ` (${Math.round(evaluation.improvementPercent)}% better)`
+                  }`
+                : "Not graded yet"}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </Disclosure>
+  );
+}
 
 export default async function CompanionPage() {
   const session = await requireSession();
@@ -57,6 +101,8 @@ export default async function CompanionPage() {
         Answers come from Adaption AI using this circle&apos;s own schedule
         {stackSlug() ? " and a care-guidance dataset prepared with Adaption Adaptive Data" : ""}.
       </p>
+
+      <AiDetails />
     </div>
   );
 }

@@ -43,6 +43,8 @@ export const joinCircleSchema = z.object({
   role,
 });
 
+export const changePasscodeSchema = z.object({ passcode });
+
 export const medicationSchema = z.object({
   name: z.string().trim().min(1, "Enter the medicine name").max(120),
   dosage: z.string().trim().max(80).default(""),

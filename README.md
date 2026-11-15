@@ -46,6 +46,11 @@ Safety rules are part of every prompt: the model never changes a dose, sends eme
   Security is enabled with no policies, so the browser cannot read or write anything directly.
 - **Auth**: passcode hashed with scrypt, signed HttpOnly session cookie (`jose`), lockout after
   5 wrong passcodes, rate-limited sign-in.
+- **Invites**: signed-in members can reveal the passcode to invite others. The scrypt hash
+  is still the only thing used to sign in. A separate AES-256-GCM copy (key derived from
+  `SESSION_SECRET` with HKDF) is decrypted only on request through a rate-limited server
+  action, so the passcode never appears in page HTML. Invite links carry only the circle code,
+  never the passcode.
 - **Reminders**: Supabase `pg_cron` calls `POST /api/cron/reminders` every 10 minutes with a
   bearer secret. Reminders are claimed in a table with a unique key before sending, so no
   reminder is ever sent twice. Emails go through **Gmail SMTP**.

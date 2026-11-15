@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   appointmentSchema,
+  changePasscodeSchema,
   chatSchema,
   createCircleSchema,
   doseLogSchema,
@@ -126,5 +127,16 @@ describe("other schemas", () => {
   it("recognises real time zones", () => {
     expect(isValidTimeZone("Asia/Kolkata")).toBe(true);
     expect(isValidTimeZone("Nowhere/Land")).toBe(false);
+  });
+});
+
+describe("changePasscodeSchema", () => {
+  it("accepts exactly 6 digits", () => {
+    expect(changePasscodeSchema.safeParse({ passcode: "204816" }).success).toBe(true);
+  });
+
+  it("rejects short or non-numeric passcodes", () => {
+    expect(changePasscodeSchema.safeParse({ passcode: "20481" }).success).toBe(false);
+    expect(changePasscodeSchema.safeParse({ passcode: "abcdef" }).success).toBe(false);
   });
 });

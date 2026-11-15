@@ -14,7 +14,7 @@ import type { Role } from "@/lib/types";
 const CODE_HINT = "It looks like MAPLE-4821. Whoever set up the circle can tell you.";
 const EMAIL_HINT = "Use the same email each time so we recognise you. You can leave it empty.";
 
-export function JoinForm() {
+export function JoinForm({ defaultCode }: { defaultCode?: string }) {
   const [role, setRole] = useState<Role>("family");
   const { state, pending, onSubmit } = useFormAction(joinCircleAction);
   const errors = state.fieldErrors ?? {};
@@ -26,6 +26,7 @@ export function JoinForm() {
           id="code"
           name="code"
           required
+          defaultValue={defaultCode}
           autoCapitalize="characters"
           autoComplete="off"
           spellCheck={false}
@@ -39,6 +40,7 @@ export function JoinForm() {
         hint="The 6 digits chosen when the circle was set up."
         error={errors.passcode}
         autoComplete="current-password"
+        autoFocus={Boolean(defaultCode)}
       />
       <Field htmlFor="yourName" label="Your name" error={errors.yourName}>
         <Input

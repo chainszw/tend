@@ -7,11 +7,15 @@ create table if not exists circles (
   elder_name text not null,
   elder_email text,
   passcode_hash text not null,
+  passcode_enc text,                            -- AES-GCM, shown to signed-in members
   timezone text not null default 'Asia/Kolkata',
   failed_attempts int not null default 0,
   locked_until timestamptz,
   created_at timestamptz not null default now()
 );
+
+-- Upgrading an existing database: supabase/migrations/002_passcode_enc.sql
+alter table circles add column if not exists passcode_enc text;
 
 create table if not exists members (
   id uuid primary key default gen_random_uuid(),

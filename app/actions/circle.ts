@@ -2,37 +2,79 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { logActivity } from "@/lib/data";
 import { db } from "@/lib/db";
+import { hashPasscode } from "@/lib/passcode";
+import { openPasscode, sealPasscode } from "@/lib/passcode-vault";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { runReminders } from "@/lib/reminder-run";
 import { requireSession } from "@/lib/session";
 import { TEXT_SIZE_COOKIE } from "@/lib/preferences";
 import type { ActionState } from "@/lib/types";
+import { changePasscodeSchema, fieldErrors } from "@/lib/validation";
 
-const allowRun = createRateLimiter(6, 60_000);
+const allowReveal = createRateLimiter(20, 60_000);
+const allowChange = createRateLimiter(5, 60_000);
 
-/** Runs the reminder check for this circle right away (same logic as the schedule). */
-export async function runRemindersNowAction(): Promise<ActionState> {
+export type RevealResult =
+  | { ok: true; passcode: string }
+  | { ok: false; needsReset?: boolean; message: string };
+
+/** Shows the circle passcode to a signed-in member so they can invite someone. */
+export async function revealPasscodeAction(): Promise<RevealResult> {
   const session = await requireSession();
-  if (!allowRun(session.circleId)) {
-    return { ok: false, message: "Reminders were just checked. Try again in a minute." };
+  if (!allowReveal(session.memberId)) {
+    return { ok: false, message: "Too many tries. Wait a minute and try again." };
   }
-  try {
-    const result = await runReminders(session.circleId);
-    if (!result.emailConfigured) {
-      return { ok: false, message: "Email is not set up yet, so no reminders can be sent." };
-    }
-    if (result.remindersSent === 0) {
-      return { ok: true, message: "Nothing is due right now. No emails were needed." };
-    }
+  const { data, error } = await db()
+    .from("circles")
+    .select("passcode_enc")
+    .eq("id", session.circleId)
+    .maybeSingle();
+  if (error || !data) {
+    if (error) console.error("Reveal passcode failed:", error.message);
+    return { ok: false, message: "We could not load the passcode. Try again." };
+  }
+  const passcode = data.passcode_enc ? openPasscode(data.passcode_enc) : null;
+  if (!passcode) {
     return {
-      ok: true,
-      message: `Sent ${result.emailsSent} email${result.emailsSent === 1 ? "" : "s"} covering ${result.remindersSent} reminder${result.remindersSent === 1 ? "" : "s"}.`,
+      ok: false,
+      needsReset: true,
+      message: "This circle was set up before passcodes could be shown. Choose a new one below.",
     };
-  } catch (error) {
-    console.error("Manual reminder run failed:", error);
-    return { ok: false, message: "The reminder check failed. Try again." };
   }
+  return { ok: true, passcode };
+}
+
+/** Sets a new circle passcode. Everyone already signed in stays signed in. */
+export async function changePasscodeAction(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const session = await requireSession();
+  if (!allowChange(session.memberId)) {
+    return { ok: false, message: "Too many changes. Wait a minute and try again." };
+  }
+  const parsed = changePasscodeSchema.safeParse({ passcode: String(formData.get("passcode") ?? "") });
+  if (!parsed.success) {
+    return { ok: false, message: "Check the passcode.", fieldErrors: fieldErrors(parsed.error) };
+  }
+  const { passcode } = parsed.data;
+  const { error } = await db()
+    .from("circles")
+    .update({
+      passcode_hash: await hashPasscode(passcode),
+      passcode_enc: sealPasscode(passcode),
+      failed_attempts: 0,
+      locked_until: null,
+    })
+    .eq("id", session.circleId);
+  if (error) {
+    console.error("Change passcode failed:", error.message);
+    return { ok: false, message: "We could not change the passcode. Try again." };
+  }
+  await logActivity(session, "changed the circle passcode");
+  revalidatePath("/circle/family");
+  return { ok: true, message: "Passcode changed. Share the new one with your circle." };
 }
 
 /** Turns the signed-in member's own email reminders on or off. */

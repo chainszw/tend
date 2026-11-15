@@ -9,10 +9,11 @@ interface PasscodeFieldProps {
   hint: string;
   error?: string;
   autoComplete: "new-password" | "current-password";
+  autoFocus?: boolean;
 }
 
 /** Six-digit passcode input with a show/hide option for easier typing. */
-export function PasscodeField({ label, hint, error, autoComplete }: PasscodeFieldProps) {
+export function PasscodeField({ label, hint, error, autoComplete, autoFocus }: PasscodeFieldProps) {
   const [visible, setVisible] = useState(false);
   return (
     <Field htmlFor="passcode" label={label} hint={hint} error={error}>
@@ -25,6 +26,7 @@ export function PasscodeField({ label, hint, error, autoComplete }: PasscodeFiel
         maxLength={6}
         required
         autoComplete={autoComplete}
+        autoFocus={autoFocus}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy("passcode", hint, error)}
         className="max-w-56 text-2xl font-bold tracking-[0.3em]"

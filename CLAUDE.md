@@ -45,7 +45,7 @@ family digests and appointment prep.
 See `.env.example`. Local values live in `.env.local` (git-ignored).
 
 ## Status (update after every milestone)
-Last updated: 2026-11-15 ~11:05 IST.
+Last updated: 2026-11-15 ~12:25 IST.
 - [x] Scaffold, deps, shadcn, git init, schema.sql, cron.sql, .env.example
 - [x] lib: db, session, passcode, lockout, validation, schedule, adherence, reminders,
       reminder-run, email (+templates), adaption, ai (+ai-parse), data, snapshot
@@ -62,7 +62,16 @@ Last updated: 2026-11-15 ~11:05 IST.
 - [x] Adaption dataset adapted (id 78c54868…): grade C→B, score 6→8.3 (+38.3%), saved to `data/adaption-eval.json`
 - [ ] Adaption:
       USER creates an Inference Stack in the Adaption app → set `ADAPTION_STACK_SLUG`
-- [ ] GitHub repo public, Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
+- [x] GitHub repo github.com/chainszw/tend (PRIVATE for now: USER makes it public at submission)
+- [x] Invite system: passcode also stored AES-256-GCM encrypted (`passcode_enc`, key = HKDF of
+      SESSION_SECRET, `lib/secret-box.ts` + `lib/passcode-vault.ts`); members tap Show on the
+      Family page; "Send an invite" shares `/join?code=…` + passcode; "Change the passcode".
+      The passcode is never put in a URL. Old circles (null `passcode_enc`) get a reset prompt.
+- [x] Family page decluttered (single column, 5 recent changes, AI panel moved to Ask, manual
+      "check reminders" button removed)
+- [x] `supabase/migrations/002_passcode_enc.sql` run in Supabase; invite flow browser-tested
+      (reveal, share, link pre-fill, change passcode, old-circle reset prompt, 390px phone)
+- [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 
 ## Known gaps / ideas if time allows
@@ -70,6 +79,15 @@ Last updated: 2026-11-15 ~11:05 IST.
 - Dockerfile for Cloud Run (deck says Top 10 need a Cloud Run link).
 - `scripts/adaption-dataset.ts`: the upload/initiate response may not include `s3_key`
   (docs are inconsistent); the script falls back to the key in the pre-signed URL path.
+
+## Phase 2 (do NOT start until the user says so)
+- Interactive Tend device simulator styled on an upper-arm BP monitor: SYS/DIA/PULSE digital
+  display, physical-style START/STOP button, memory recall, 2-user mode, irregular-heartbeat
+  flag, animated inflate/deflate progress, simulated readings.
+- Sign-up question "Do you have the Tend device?" → if yes, connect it and show a richer but
+  still simple dashboard (readings, averages, trends).
+- MUST reuse the same backend, DB, circle/member records and lib logic. No second app and no
+  duplicated business logic.
 
 ## Next step
 Design overhaul (user will brief), then deploy.
