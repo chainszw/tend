@@ -8,7 +8,15 @@ import {
   type AdherenceSummary,
   type DoseSlot,
 } from "@/lib/adherence";
-import { getCircle, listAppointments, listDoseLogs, listMedications } from "@/lib/data";
+import {
+  getCircle,
+  listAppointments,
+  listDoseLogs,
+  listMedications,
+  listReadings,
+} from "@/lib/data";
+import { describeReading, type StoredReading } from "@/lib/device/readings";
+import { formatDateTime } from "@/lib/format";
 import { localDateString } from "@/lib/schedule";
 import type { Appointment, Circle, Medication } from "@/lib/types";
 
@@ -23,6 +31,7 @@ export interface CareSnapshot {
   slots: DoseSlot<Medication>[];
   adherence: AdherenceSummary;
   appointments: Appointment[];
+  readings: StoredReading[];
 }
 
 /** Loads the circle or signs the visitor out if it no longer exists. */
@@ -38,11 +47,12 @@ export const loadCircle = cache(async (circleId: string): Promise<Circle> => {
  */
 export const loadSnapshot = cache(async (circleId: string): Promise<CareSnapshot> => {
   const now = new Date();
-  const [circle, medications, logs, appointments] = await Promise.all([
+  const [circle, medications, logs, appointments, readings] = await Promise.all([
     loadCircle(circleId),
     listMedications(circleId, { activeOnly: true }),
     listDoseLogs(circleId, new Date(now.getTime() - (HISTORY_DAYS + 1) * DAY_MS)),
     listAppointments(circleId, { from: now, limit: 5 }),
+    listReadings(circleId, 12),
   ]);
   const today = localDateString(now, circle.timezone);
   return {
@@ -53,5 +63,14 @@ export const loadSnapshot = cache(async (circleId: string): Promise<CareSnapshot
     slots: buildDay(medications, indexLogs(logs), today, circle.timezone, now),
     adherence: summariseAdherence(medications, logs, circle.timezone, now, HISTORY_DAYS),
     appointments,
+    readings,
   };
 });
+
+/** The snapshot's device readings as dated lines for `describeReadings`. */
+export function readingFacts(snapshot: CareSnapshot): { text: string; when: string }[] {
+  return snapshot.readings.map((reading) => ({
+    text: describeReading(reading),
+    when: formatDateTime(reading.taken_at, snapshot.circle.timezone),
+  }));
+}

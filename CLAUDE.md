@@ -45,7 +45,7 @@ family digests and appointment prep.
 See `.env.example`. Local values live in `.env.local` (git-ignored).
 
 ## Status (update after every milestone)
-Last updated: 2026-11-15 ~12:25 IST.
+Last updated: 2026-11-15 ~14:30 IST.
 - [x] Scaffold, deps, shadcn, git init, schema.sql, cron.sql, .env.example
 - [x] lib: db, session, passcode, lockout, validation, schedule, adherence, reminders,
       reminder-run, email (+templates), adaption, ai (+ai-parse), data, snapshot
@@ -53,7 +53,7 @@ Last updated: 2026-11-15 ~12:25 IST.
 - [x] Cron route `/api/cron/reminders` (401 without the bearer secret, verified)
 - [x] Screens written: landing, create, join, Today, Medicines (+prescription import),
       Visits, Ask (Companion), Family
-- [x] 82 unit tests green, lint clean, tsc clean, README written
+- [x] 115 unit tests green (82 at first milestone), lint clean, tsc clean, README written
 - [x] Adaption dataset (48 rows) + `scripts/adaption-dataset.ts` written and run
 - [x] Supabase URL + secret key set, `schema.sql` run (7 tables verified)
 - [x] Gmail SMTP set (reminders.tend@gmail.com), login + test send verified
@@ -78,6 +78,18 @@ Last updated: 2026-11-15 ~12:25 IST.
       in browser (`lib/image-resize.ts`) → `scanPrescriptionAction` → Adaption `gemma-4-31b-it`
       transcribes the image (`input_image` data URL, verified working) → extraction → review.
       No extra key. Body limit 5mb.
+- [x] Tend Home Station (Phase 2 device): public `/device` page with an interactive 3D model
+      (React Three Fiber + drei, original procedural geometry, no GLB) in
+      `components/device/*`. The LCD is real HTML (`device-screen.tsx`) placed on the model with
+      drei `<Html transform>`; all Html mounts into one overlay div via `OverlayContext` (without
+      it the first Html stays empty and the LCD sits off the glass). Pure logic in `lib/device/*`
+      (`machine.ts` reducer + voice commands, `readings.ts` simulate/assess/format, `parts.ts`
+      bill of materials), tests in `tests/device.test.ts`. "Show inside" = exploded view + parts
+      and estimated ₹ costs. Signed out = demo (nothing stored); signed in = `saveReadingAction`
+      → `readings` table → `/circle/health` (new "Health" nav item), activity log, Companion and
+      digest facts. Voice: speechSynthesis guidance + SpeechRecognition commands (Chrome);
+      Permissions-Policy now `microphone=(self)`.
+- [x] `supabase/migrations/003_readings.sql` run in Supabase; user confirmed saving works
 - [ ] Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
 
@@ -87,7 +99,7 @@ Last updated: 2026-11-15 ~12:25 IST.
 - `scripts/adaption-dataset.ts`: the upload/initiate response may not include `s3_key`
   (docs are inconsistent); the script falls back to the key in the pre-signed URL path.
 
-## Phase 2 (do NOT start until the user says so)
+## Phase 2 (device built, see Status; not done: sign-up question "Do you have the Tend device?", 2-user mode)
 - Interactive Tend device simulator styled on an upper-arm BP monitor: SYS/DIA/PULSE digital
   display, physical-style START/STOP button, memory recall, 2-user mode, irregular-heartbeat
   flag, animated inflate/deflate progress, simulated readings.

@@ -5,6 +5,7 @@ import { adaptionConfigured } from "@/lib/adaption";
 import type { MedicationDraft } from "@/lib/ai-parse";
 import {
   describeAdherence,
+  describeReadings,
   describeAppointments,
   describeMedications,
   describeToday,
@@ -12,7 +13,7 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { requireSession } from "@/lib/session";
-import { loadSnapshot } from "@/lib/snapshot";
+import { loadSnapshot, readingFacts } from "@/lib/snapshot";
 import { ROLE_LABELS } from "@/lib/types";
 import { chatSchema, checkPrescriptionImage, prescriptionTextSchema } from "@/lib/validation";
 
@@ -120,6 +121,8 @@ export async function askCompanionAction(messages: unknown): Promise<CompanionRe
     "Today's doses:",
     describeToday(snapshot.slots),
     describeAdherence(snapshot.adherence),
+    "Health readings from the Tend device (simulated prototype):",
+    describeReadings(readingFacts(snapshot)),
     "Upcoming appointments:",
     describeAppointments(
       snapshot.appointments.map((appointment) => ({
@@ -161,6 +164,8 @@ export async function writeDigestAction(): Promise<DigestResult> {
   const snapshot = await loadSnapshot(session.circleId);
   const facts = [
     describeAdherence(snapshot.adherence),
+    "Health readings from the Tend device (simulated prototype):",
+    describeReadings(readingFacts(snapshot)),
     "Medicines:",
     describeMedications(snapshot.medications),
     "Upcoming appointments:",

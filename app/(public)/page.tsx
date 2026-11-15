@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BellRing, Check, MessageCircleQuestion, UsersRound } from "lucide-react";
+import { Activity, BellRing, Check, MessageCircleQuestion, UsersRound } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 const SAMPLE_DAY = [
@@ -81,6 +81,10 @@ export default function LandingPage() {
             </Link>
             <Link href="/join" className={buttonVariants({ size: "lg", variant: "outline" })}>
               Join with a code
+            </Link>
+            <Link href="/device" className={buttonVariants({ size: "lg", variant: "amber" })}>
+              <Activity aria-hidden="true" />
+              Try the Tend device
             </Link>
           </div>
           <p className="text-muted-foreground">Free to use. No app to install. Works on any phone.</p>

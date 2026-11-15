@@ -17,6 +17,27 @@ Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Manag
 | Go beyond a reminder app | Prescription import, a grounded Care Companion, AI visit preparation, weekly family updates, and a change log that keeps the elder informed. |
 | Elder stays at the centre | Large-text mode by default for the elder, read-aloud on every key screen, one-tap dose buttons, and every change by family or caretakers is listed with their name. |
 
+## Tend Home Station (interactive device prototype)
+
+`/device` (linked from the homepage as "Try the Tend device") is a working 3D prototype of a
+low-cost home health station for older people: an upper-arm blood pressure cuff, a fingertip
+pulse oximeter, a thermometer and an optional wireless weighing scale, each modelled as a
+separate accessory around one small unit with a screen, three large buttons and a voice.
+
+- Power it on, pick a measurement, follow the spoken steps, start or stop, read the result in
+  plain words and save it. The screen is real HTML on the 3D model, so it works with a
+  keyboard and a screen reader; the same controls are repeated as ordinary buttons below.
+- "Show inside" opens the device and lists every part, what it is made of, what it does and a
+  rough cost estimate in rupees.
+- Signed in, a saved reading goes to the care circle (`readings` table): it appears under
+  Health, in the family's activity list, and in what the Care Companion can talk about.
+  Signed out, it is a demo and nothing is stored.
+- Built with React Three Fiber and drei from original geometry (no downloaded models). The
+  logic is pure and tested in `lib/device/*`.
+
+The readings are simulated. This is a design prototype, not a manufactured or clinically
+validated medical device. Database: run `supabase/migrations/003_readings.sql` once.
+
 ## How Adaption AI is used
 
 All AI features call [Adaption](https://docs.adaptionlabs.ai) from the server (`lib/adaption.ts`).

@@ -6,7 +6,8 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    // The microphone is used only by the Home Station voice assistant, on this origin.
+    value: "camera=(), microphone=(self), geolocation=()",
   },
   {
     key: "Strict-Transport-Security",

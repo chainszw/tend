@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { readingFromRow, type ReadingRow, type StoredReading } from "@/lib/device/readings";
 import type { Session } from "@/lib/session";
 import type {
   ActivityEntry,
@@ -122,4 +123,27 @@ export async function logActivity(session: Session, summary: string): Promise<vo
     summary: summary.slice(0, 300),
   });
   if (error) console.error("Could not record activity:", error.message);
+}
+
+const READING_COLUMNS =
+  "id, kind, systolic, diastolic, pulse, spo2, temperature_c, weight_kg, irregular, taken_at";
+
+/**
+ * Newest device readings first. Returns an empty list (instead of failing the
+ * page) if the `readings` table has not been created yet.
+ */
+export async function listReadings(circleId: string, limit = 30): Promise<StoredReading[]> {
+  const { data, error } = await db()
+    .from("readings")
+    .select(READING_COLUMNS)
+    .eq("circle_id", circleId)
+    .order("taken_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error("Could not load readings:", error.message);
+    return [];
+  }
+  return ((data ?? []) as ReadingRow[])
+    .map(readingFromRow)
+    .filter((reading): reading is StoredReading => reading !== null);
 }
