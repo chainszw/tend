@@ -48,7 +48,7 @@ async function insertReading(
   return { ok: true, message: "Reading saved", reading };
 }
 
-/** Saves a reading confirmed on the Home Station to the signed-in member's circle. */
+/** Saves a reading confirmed on the Home Station to the signed-in member's family. */
 export async function saveReadingAction(input: unknown): Promise<SaveReadingResult> {
   const session = await requireSession();
   if (!allowSave(session.memberId)) {

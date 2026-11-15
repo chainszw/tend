@@ -36,7 +36,7 @@ export const createCircleSchema = z.object({
 });
 
 export const joinCircleSchema = z.object({
-  code: z.string().trim().min(4, "Enter the circle code").max(20),
+  code: z.string().trim().min(4, "Enter the family code").max(20),
   passcode,
   yourName: name,
   yourEmail: optionalEmail,

@@ -38,7 +38,7 @@ export default async function HealthPage() {
         <div className="max-w-[40rem]">
           <h1 className="text-4xl font-extrabold">Health readings</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            Readings {circle.elder_name} takes appear here for the whole circle. Use the Tend Home
+            Readings {circle.elder_name} takes appear here for the whole family. Use the Tend Home
             Station, or type a reading in yourself. In this prototype the device is a simulation.
           </p>
         </div>

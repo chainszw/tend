@@ -22,7 +22,7 @@ export function CreateForm() {
   const [role, setRole] = useState<Role>("family");
   const { state, pending, onSubmit } = useFormAction(createCircleAction);
   const errors = state.fieldErrors ?? {};
-  // Reminder times follow the time zone of the device that sets up the circle.
+  // Reminder times follow the time zone of the device that sets up the family.
   const timezone = useSyncExternalStore(subscribeNever, browserTimeZone, serverTimeZone);
 
   return (
@@ -87,14 +87,14 @@ export function CreateForm() {
 
       <PasscodeField
         label="Choose a 6-digit passcode"
-        hint="Everyone in the circle uses this passcode to get in. Share it only with people you trust."
+        hint="Everyone in the family uses this passcode to get in. Share it only with people you trust."
         error={errors.passcode}
         autoComplete="new-password"
       />
 
       <FormMessage message={state.ok ? undefined : state.message} />
       <Button type="submit" size="lg" disabled={pending} className="self-start">
-        {pending ? "Creating the circle…" : "Create the care circle"}
+        {pending ? "Creating the family…" : "Create the family"}
       </Button>
     </form>
   );

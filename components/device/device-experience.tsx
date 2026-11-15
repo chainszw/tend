@@ -74,7 +74,7 @@ function subscribeReducedMotion(notify: () => void) {
 }
 
 interface DeviceExperienceProps {
-  /** The elder's name when signed in to a circle; null in the public demo. */
+  /** The elder's name when signed in to a family; null in the public demo. */
   elderName: string | null;
   initialReadings: StoredReading[];
 }
@@ -355,7 +355,7 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
         <p className="text-muted-foreground">
           {signedIn ? (
             <>
-              Saved readings go to {elderName}&apos;s care circle.{" "}
+              Saved readings go to {elderName}&apos;s family.{" "}
               <Link href="/circle/health" className="font-bold text-primary underline underline-offset-4">
                 See them under Health
               </Link>
@@ -365,7 +365,7 @@ export function DeviceExperience({ elderName, initialReadings }: DeviceExperienc
             <>
               You are trying the demo, so readings are not stored.{" "}
               <Link href="/join" className="font-bold text-primary underline underline-offset-4">
-                Join a care circle
+                Join a family
               </Link>{" "}
               to share them with family.
             </>

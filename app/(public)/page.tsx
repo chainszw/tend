@@ -13,7 +13,7 @@ const FEATURES = [
   {
     icon: UsersRound,
     title: "One schedule the whole family sees",
-    body: "The person being cared for, their family and their caretakers open the same circle with a code and passcode. Anyone can add a medicine or an appointment, and everyone sees who changed what.",
+    body: "The person being cared for, their family and their caretakers open the same family with a code and passcode. Anyone can add a medicine or an appointment, and everyone sees who changed what.",
   },
   {
     icon: BellRing,
@@ -71,7 +71,7 @@ export default function LandingPage() {
             Every medicine taken, every doctor visit remembered, together.
           </h1>
           <p className="max-w-[34rem] text-xl text-muted-foreground">
-            Tend is a shared care circle for one older person. They stay in charge of their own
+            Tend is a shared family space for one older person. They stay in charge of their own
             day. Family and caretakers see the same schedule and hear about it when a dose is
             missed.
           </p>

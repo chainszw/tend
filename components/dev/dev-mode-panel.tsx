@@ -39,8 +39,8 @@ function write(key: string, value: string) {
 const FOCUS = "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring";
 
 /**
- * Fixed corner button. Open it to jump straight to any screen of the demo circle,
- * including the 3D device, without a circle code or passcode.
+ * Fixed corner button. Open it to jump straight to any screen of the demo family,
+ * including the 3D device, without a family code or passcode.
  */
 export function DevModePanel() {
   const open = useSyncExternalStore(subscribe, () => read(OPEN_KEY) === "1", () => false);
@@ -69,7 +69,7 @@ export function DevModePanel() {
         >
           <h2 className="text-lg font-extrabold">Dev mode</h2>
           <p className="mt-1 text-[0.9rem] text-muted-foreground">
-            Open any screen of a ready-made demo circle. No sign-in needed.
+            Open any screen of a ready-made demo family. No sign-in needed.
           </p>
 
           <fieldset className="mt-3">

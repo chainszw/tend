@@ -12,7 +12,7 @@ interface RolePickerProps {
   onChange: (role: Role) => void;
 }
 
-/** Radio group for choosing how the person relates to the care circle. */
+/** Radio group for choosing how the person relates to the family. */
 export function RolePicker({ legend, value, onChange }: RolePickerProps) {
   return (
     <fieldset className="flex flex-col gap-2">

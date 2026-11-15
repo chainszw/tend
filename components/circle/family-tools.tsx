@@ -30,7 +30,7 @@ async function copyText(text: string, success: string): Promise<boolean> {
 }
 
 /**
- * Everything needed to bring someone into the circle: the code, the passcode
+ * Everything needed to bring someone into the family: the code, the passcode
  * (fetched only when asked for), a ready-to-send invite, and a way to change
  * the passcode.
  */
@@ -77,7 +77,7 @@ export function InviteCard({ code, elderName }: { code: string; elderName: strin
   }
 
   async function copyCode() {
-    if (await copyText(code, "Circle code copied")) setCopied(true);
+    if (await copyText(code, "Family code copied")) setCopied(true);
   }
 
   function shareInvite() {
@@ -85,10 +85,10 @@ export function InviteCard({ code, elderName }: { code: string; elderName: strin
       const secret = await loadPasscode();
       if (!secret) return;
       const link = `${window.location.origin}/join?code=${encodeURIComponent(code)}`;
-      const text = `Join ${elderName}'s care circle on Tend.\nOpen ${link}\nCircle code: ${code}\nPasscode: ${secret}`;
+      const text = `Join ${elderName}'s family on Tend.\nOpen ${link}\nCircle code: ${code}\nPasscode: ${secret}`;
       if (typeof navigator.share === "function") {
         try {
-          await navigator.share({ title: "Join our care circle on Tend", text });
+          await navigator.share({ title: "Join our family on Tend", text });
           return;
         } catch (error) {
           if (error instanceof DOMException && error.name === "AbortError") return;
@@ -102,12 +102,12 @@ export function InviteCard({ code, elderName }: { code: string; elderName: strin
     <div className="flex flex-col gap-5">
       <dl className="grid gap-4 sm:grid-cols-2">
         <div>
-          <dt className="font-bold text-muted-foreground">Circle code</dt>
+          <dt className="font-bold text-muted-foreground">Family code</dt>
           <dd className="mt-1 flex flex-wrap items-center gap-3">
             <span className="well rounded-xl px-4 py-2 text-2xl font-extrabold tracking-wider">
               {code}
             </span>
-            <Button type="button" variant="quiet" size="icon" onClick={copyCode} aria-label="Copy the circle code">
+            <Button type="button" variant="quiet" size="icon" onClick={copyCode} aria-label="Copy the family code">
               {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
             </Button>
           </dd>
@@ -142,7 +142,7 @@ export function InviteCard({ code, elderName }: { code: string; elderName: strin
 
       {needsReset ? (
         <p role="status" className="rounded-xl bg-amber-soft p-3 font-bold">
-          This circle was set up before passcodes could be shown. Choose a new one below.
+          This family was set up before passcodes could be shown. Choose a new one below.
         </p>
       ) : null}
 

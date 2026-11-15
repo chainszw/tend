@@ -1,6 +1,6 @@
 # Tend
 
-**A shared care circle for one older person.** The elder, their family and their caretakers
+**A shared family space for one older person.** The elder, their family and their caretakers
 manage medicines and doctor visits in one place, and get an email when something is due or
 has been missed.
 
@@ -25,26 +25,26 @@ Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Manag
 
 | Challenge requirement | How Tend does it |
 | --- | --- |
-| Shared profile with passcode access | A care circle is opened with a circle code (for example `MAPLE-4821`) and a 6-digit passcode. Elder, family and caretaker roles share one view. |
+| Shared profile with passcode access | A family is opened with a family code (for example `MAPLE-4821`) and a 6-digit passcode. Elder, family and caretaker roles share one view. |
 | Add, view, edit and manage medication schedules | Medicines have a dose, times of day, days of the week, start and end dates. They can be edited, paused, resumed or removed. |
 | Track adherence | Each dose is marked Taken or Skipped. Unmarked doses become "missed" after an hour. A 7-day view shows the share of doses taken and the current streak. |
 | Monitor doctor appointments | Visits are listed with date, doctor, place and notes, and can be added to Google Calendar in one click. |
-| Proactive email reminders | An email goes out 30 minutes before a dose, when a dose is missed (to the whole circle), and the day before and 2 hours before a visit. |
+| Proactive email reminders | An email goes out 30 minutes before a dose, when a dose is missed (to the whole family), and the day before and 2 hours before a visit. |
 | Go beyond a reminder app | Prescription import by camera, a grounded Care Companion, AI visit preparation, weekly family updates, health readings, a home device prototype, and voice. |
 | Elder stays at the centre | Larger text by default for the elder, read-aloud on key screens, one-tap dose buttons, and every change by family or caretakers is listed with their name. |
 
 ## Features
 
-### Care circle: one shared profile
-One circle is created per older person. Whoever sets it up chooses their role (the elder,
-family, or a caretaker) and a 6-digit passcode, and gets a circle code. Everyone else joins
+### Family: one shared profile
+One family is created per older person. Whoever sets it up chooses their role (the elder,
+family, or a caretaker) and a 6-digit passcode, and gets a family code. Everyone else joins
 with the code and the passcode and adds their own name and email, so reminders reach the
 right people and every change carries a name.
 
 ### Inviting family and caretakers
 On the Family page any signed-in member can tap **Show** to reveal the passcode, **Send an
 invite** to share a join link through the phone's share sheet, or **Change the passcode**.
-The link carries only the circle code. The passcode is never put in a URL.
+The link carries only the family code. The passcode is never put in a URL.
 
 ### Today: the pill organiser
 The home screen is laid out like a pill organiser: Morning, Afternoon, Evening and Night.
@@ -73,23 +73,23 @@ Calendar** link, and **Prepare for this visit** asks Adaption AI for questions w
 the doctor, based on the visit, the current medicines and recently missed doses.
 
 ### Email reminders
-Every 10 minutes a scheduled job checks every circle and sends:
+Every 10 minutes a scheduled job checks every family and sends:
 
 - **Upcoming dose**: 30 minutes before, to the elder and caretakers.
-- **Missed dose**: once a dose has gone unmarked, to the whole circle.
-- **Doctor visit**: the day before and 2 hours before, to the whole circle.
+- **Missed dose**: once a dose has gone unmarked, to the whole family.
+- **Doctor visit**: the day before and 2 hours before, to the whole family.
 
 Each member can turn their own reminder emails on or off on the Family page. Each reminder is claimed in a table with a unique key before it is sent, so a reminder can
 never be sent twice, even if the job runs twice.
 
 ### Care Companion (Ask)
 A single chat that answers questions such as "What do I still need to take today?" in plain
-language. It is given the circle's own medicines, today's doses, adherence, visits and
+language. It is given the family's own medicines, today's doses, adherence, visits and
 health readings, and is grounded on a care-guidance dataset. It can be typed to or spoken
 to, and can read its answers aloud. It never changes a dose and sends emergencies to 112.
 
 ### Family page
-A short list of who is in the circle, the five most recent changes with the name of who
+A short list of who is in the family, the five most recent changes with the name of who
 made them, a **weekly update** that turns the adherence numbers into a few warm sentences
 for relatives, and the invite tools above.
 
@@ -110,7 +110,7 @@ large buttons and a voice.
   and a screen reader; the same controls are repeated as ordinary buttons below.
 - **Show inside** opens the device and lists every part, what it does and a rough cost in
   rupees.
-- Signed in, a saved reading goes to the care circle. Signed out, it is a demo and nothing
+- Signed in, a saved reading goes to the family. Signed out, it is a demo and nothing
   is stored.
 - Built with React Three Fiber and drei from original geometry (no downloaded models).
 
@@ -146,7 +146,7 @@ All AI features call [Adaption](https://docs.adaptionlabs.ai) from the server
 
 1. **Prescription import** (`extractMedications`): a vision model transcribes the photo,
    then the text is read into structured medicines for a person to review.
-2. **Care Companion** (`companionReply`): answers from the circle's own record, grounded on
+2. **Care Companion** (`companionReply`): answers from the family's own record, grounded on
    a care-guidance dataset through an Adaption **Inference Stack** with `file_search`.
 3. **Adaptive Data** (`scripts/adaption-dataset.ts`): the guidance dataset
    (`data/eldercare-guidance.jsonl`, 48 rows) is uploaded, adapted and evaluated by
@@ -205,7 +205,7 @@ view.
 
 ```
 app/            pages, server actions, the cron route
-components/     UI: public forms, the signed-in circle, device, voice, base components
+components/     UI: public forms, the signed-in family, device, voice, base components
 lib/            data access, auth, schedule/adherence/reminder logic, Adaption client, i18n
 supabase/       schema.sql (tables + RLS), migrations, cron.sql (reminder schedule)
 scripts/        adaption-dataset.ts (Adaptive Data pipeline)
@@ -229,9 +229,9 @@ npm run dev
 ### Dev mode: every screen without signing in
 A **Dev mode** button sits in the bottom-right corner of every page. Open it, pick a role
 (Elder, Family or Caretaker) and jump straight to Today, Medicines, Visits, Health, Ask,
-Family or the 3D device in a ready-made demo circle, with no circle code or passcode. It
+Family or the 3D device in a ready-made demo family, with no family code or passcode. It
 is always on in `npm run dev`; in production it appears only when `DEV_MODE=on` is set,
-and it can open nothing except the demo circle.
+and it can open nothing except the demo family.
 
 ## Deploy
 

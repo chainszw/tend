@@ -44,7 +44,7 @@ export const DEVICE_PARTS: readonly DevicePart[] = [
     id: "board",
     name: "Controller board",
     material: "ESP32-class microcontroller with Wi-Fi and Bluetooth on a two-layer FR4 circuit board",
-    role: "Runs the menus, reads every sensor and sends readings to the family's care circle.",
+    role: "Runs the menus, reads every sensor and sends readings to the family's family.",
     costInr: 330,
     where: "main unit",
   },

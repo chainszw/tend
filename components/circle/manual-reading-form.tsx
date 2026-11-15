@@ -30,7 +30,7 @@ const FIELDS: Record<ReadingKind, FieldSpec[]> = {
   weight: [{ name: "weight_kg", label: "Weight (kg)", hint: "For example 62.5", inputMode: "decimal" }],
 };
 
-/** Lets anyone in the circle type in a reading taken with their own equipment. */
+/** Lets anyone in the family type in a reading taken with their own equipment. */
 export function ManualReadingForm({ onSaved }: { onSaved?: () => void }) {
   const [kind, setKind] = useState<ReadingKind>("bp");
   const formRef = useRef<HTMLFormElement>(null);

@@ -14,7 +14,7 @@ import type { Medication } from "@/lib/types";
 
 interface MedicationFormProps {
   medication?: Medication;
-  /** Today's date in the circle's time zone (`YYYY-MM-DD`). */
+  /** Today's date in the family's time zone (`YYYY-MM-DD`). */
   today: string;
   onSaved: () => void;
 }

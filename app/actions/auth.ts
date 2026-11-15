@@ -17,7 +17,7 @@ import type { ActionState, Role } from "@/lib/types";
 import { createCircleSchema, fieldErrors, joinCircleSchema } from "@/lib/validation";
 
 const allowAttempt = createRateLimiter(10, 60_000);
-const GENERIC_JOIN_ERROR = "That circle code and passcode do not match. Check both and try again.";
+const GENERIC_JOIN_ERROR = "That family code and passcode do not match. Check both and try again.";
 
 async function clientKey(): Promise<string> {
   const forwarded = (await headers()).get("x-forwarded-for");
@@ -28,7 +28,7 @@ function formValues(formData: FormData, keys: readonly string[]): Record<string,
   return Object.fromEntries(keys.map((key) => [key, String(formData.get(key) ?? "")]));
 }
 
-/** Creates a care circle, its first member, and signs that member in. */
+/** Creates a family, its first member, and signs that member in. */
 export async function createCircleAction(
   _previous: ActionState,
   formData: FormData,
@@ -65,11 +65,11 @@ export async function createCircleAction(
       .single();
     if (data) circle = data;
     else if (error?.code !== "23505") {
-      console.error("Create circle failed:", error?.message);
-      return { ok: false, message: "We could not create the circle. Try again." };
+      console.error("Create family failed:", error?.message);
+      return { ok: false, message: "We could not create the family. Try again." };
     }
   }
-  if (!circle) return { ok: false, message: "We could not create the circle. Try again." };
+  if (!circle) return { ok: false, message: "We could not create the family. Try again." };
 
   const { data: member, error: memberError } = await supabase
     .from("members")
@@ -83,7 +83,7 @@ export async function createCircleAction(
     .single();
   if (memberError || !member) {
     console.error("Create member failed:", memberError?.message);
-    return { ok: false, message: "We could not create the circle. Try again." };
+    return { ok: false, message: "We could not create the family. Try again." };
   }
 
   await createSession({
@@ -95,7 +95,7 @@ export async function createCircleAction(
   redirect("/circle/family?welcome=1");
 }
 
-/** Joins (or signs back in to) a circle with its code and passcode. */
+/** Joins (or signs back in to) a family with its code and passcode. */
 export async function joinCircleAction(
   _previous: ActionState,
   formData: FormData,
@@ -123,7 +123,7 @@ export async function joinCircleAction(
   if (isLocked(circle, now)) {
     return {
       ok: false,
-      message: `Too many wrong passcodes. This circle is locked for ${minutesUntilUnlock(circle, now)} more minutes.`,
+      message: `Too many wrong passcodes. This family is locked for ${minutesUntilUnlock(circle, now)} more minutes.`,
     };
   }
 
@@ -158,15 +158,15 @@ export async function joinCircleAction(
       .select("id, name, role")
       .single();
     if (error || !created) {
-      console.error("Join circle failed:", error?.message);
-      return { ok: false, message: "We could not add you to the circle. Try again." };
+      console.error("Join family failed:", error?.message);
+      return { ok: false, message: "We could not add you to the family. Try again." };
     }
     member = created;
     await supabase.from("activity").insert({
       circle_id: circle.id,
       member_name: created.name,
       member_role: created.role,
-      summary: "joined the care circle",
+      summary: "joined the family",
     });
   }
 

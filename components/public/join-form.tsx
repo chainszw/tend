@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useFormAction } from "@/hooks/use-form-action";
 import type { Role } from "@/lib/types";
 
-const CODE_HINT = "It looks like MAPLE-4821. Whoever set up the circle can tell you.";
+const CODE_HINT = "It looks like MAPLE-4821. Whoever set up the family can tell you.";
 const EMAIL_HINT = "Use the same email each time so we recognise you. You can leave it empty.";
 
 export function JoinForm({ defaultCode }: { defaultCode?: string }) {
@@ -21,7 +21,7 @@ export function JoinForm({ defaultCode }: { defaultCode?: string }) {
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-      <Field htmlFor="code" label="Circle code" hint={CODE_HINT} error={errors.code}>
+      <Field htmlFor="code" label="Family code" hint={CODE_HINT} error={errors.code}>
         <Input
           id="code"
           name="code"
@@ -37,7 +37,7 @@ export function JoinForm({ defaultCode }: { defaultCode?: string }) {
       </Field>
       <PasscodeField
         label="Passcode"
-        hint="The 6 digits chosen when the circle was set up."
+        hint="The 6 digits chosen when the family was set up."
         error={errors.passcode}
         autoComplete="current-password"
         autoFocus={Boolean(defaultCode)}
@@ -62,11 +62,11 @@ export function JoinForm({ defaultCode }: { defaultCode?: string }) {
           aria-describedby={describedBy("yourEmail", EMAIL_HINT, errors.yourEmail)}
         />
       </Field>
-      <RolePicker legend="Who are you in this circle?" value={role} onChange={setRole} />
+      <RolePicker legend="Who are you in this family?" value={role} onChange={setRole} />
 
       <FormMessage message={state.ok ? undefined : state.message} />
       <Button type="submit" size="lg" disabled={pending} className="self-start">
-        {pending ? "Opening the circle…" : "Open the care circle"}
+        {pending ? "Opening the family…" : "Open the family"}
       </Button>
     </form>
   );

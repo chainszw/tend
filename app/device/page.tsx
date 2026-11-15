@@ -26,7 +26,7 @@ export default async function DevicePage() {
         <Wordmark href={home} />
         <Link href={home} className={buttonVariants({ variant: "ghost", size: "sm" })}>
           <ArrowLeft aria-hidden="true" />
-          {circle ? "Care circle" : "Home"}
+          {circle ? "Family" : "Home"}
         </Link>
       </header>
       <main id="main" className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-5 pb-14">

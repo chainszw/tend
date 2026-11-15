@@ -29,7 +29,7 @@ export interface AppointmentFormValues {
   specialty: string;
   location: string;
   notes: string;
-  /** Local date and time in the circle's time zone. */
+  /** Local date and time in the family's time zone. */
   date: string;
   time: string;
 }
@@ -128,7 +128,7 @@ export function AddAppointmentButton({ today }: { today: string }) {
         <DialogHeader>
           <DialogTitle>Add a doctor visit</DialogTitle>
           <DialogDescription>
-            Everyone in the circle gets an email the day before and again shortly before.
+            Everyone in the family gets an email the day before and again shortly before.
           </DialogDescription>
         </DialogHeader>
         <AppointmentForm today={today} onSaved={() => setOpen(false)} />
@@ -187,7 +187,7 @@ export function AppointmentControls(props: AppointmentControlsProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit visit</DialogTitle>
-            <DialogDescription>Changes show up for everyone in the circle.</DialogDescription>
+            <DialogDescription>Changes show up for everyone in the family.</DialogDescription>
           </DialogHeader>
           <AppointmentForm appointment={appointment} today={today} onSaved={() => setOpen(false)} />
         </DialogContent>

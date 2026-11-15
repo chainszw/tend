@@ -20,7 +20,7 @@ export type RevealResult =
   | { ok: true; passcode: string }
   | { ok: false; needsReset?: boolean; message: string };
 
-/** Shows the circle passcode to a signed-in member so they can invite someone. */
+/** Shows the family passcode to a signed-in member so they can invite someone. */
 export async function revealPasscodeAction(): Promise<RevealResult> {
   const session = await requireSession();
   if (!allowReveal(session.memberId)) {
@@ -40,13 +40,13 @@ export async function revealPasscodeAction(): Promise<RevealResult> {
     return {
       ok: false,
       needsReset: true,
-      message: "This circle was set up before passcodes could be shown. Choose a new one below.",
+      message: "This family was set up before passcodes could be shown. Choose a new one below.",
     };
   }
   return { ok: true, passcode };
 }
 
-/** Sets a new circle passcode. Everyone already signed in stays signed in. */
+/** Sets a new family passcode. Everyone already signed in stays signed in. */
 export async function changePasscodeAction(
   _previous: ActionState,
   formData: FormData,
@@ -73,9 +73,9 @@ export async function changePasscodeAction(
     console.error("Change passcode failed:", error.message);
     return { ok: false, message: "We could not change the passcode. Try again." };
   }
-  await logActivity(session, "changed the circle passcode");
+  await logActivity(session, "changed the family passcode");
   revalidatePath("/circle/family");
-  return { ok: true, message: "Passcode changed. Share the new one with your circle." };
+  return { ok: true, message: "Passcode changed. Share the new one with your family." };
 }
 
 /** Turns the signed-in member's own email reminders on or off. */

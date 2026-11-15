@@ -62,7 +62,7 @@ export function MedicationControls({ medication, today }: { medication: Medicati
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit {medication.name}</DialogTitle>
-            <DialogDescription>Changes show up for everyone in the circle.</DialogDescription>
+            <DialogDescription>Changes show up for everyone in the family.</DialogDescription>
           </DialogHeader>
           <MedicationForm medication={medication} today={today} onSaved={() => setOpen(false)} />
         </DialogContent>

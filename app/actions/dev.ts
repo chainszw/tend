@@ -19,10 +19,10 @@ const DEV_MEMBERS: Record<Role, string> = {
 };
 const DAY_MS = 86_400_000;
 
-/** Creates the demo circle with members, medicines and a visit. Returns its id. */
+/** Creates the demo family with members, medicines and a visit. Returns its id. */
 async function createDemoCircle(): Promise<string | null> {
   const supabase = db();
-  // A random passcode nobody knows: the demo circle can only be opened through this shortcut.
+  // A random passcode nobody knows: the demo family can only be opened through this shortcut.
   const passcode = String(randomInt(1_000_000)).padStart(6, "0");
   const { data: circle, error } = await supabase
     .from("circles")
@@ -38,7 +38,7 @@ async function createDemoCircle(): Promise<string | null> {
     .single();
   if (error || !circle) {
     // Another tab may have created it at the same moment.
-    if (error?.code !== "23505") console.error("Create demo circle failed:", error?.message);
+    if (error?.code !== "23505") console.error("Create demo family failed:", error?.message);
     return null;
   }
 
@@ -77,7 +77,7 @@ async function createDemoCircle(): Promise<string | null> {
 }
 
 /**
- * Dev mode only: signs into the demo circle as the chosen role and opens one of the
+ * Dev mode only: signs into the demo family as the chosen role and opens one of the
  * listed screens. Anything else is a 404.
  */
 export async function devOpenAction(role: Role, destination: string): Promise<void> {
@@ -89,7 +89,7 @@ export async function devOpenAction(role: Role, destination: string): Promise<vo
   const find = () => supabase.from("circles").select("id").eq("code", DEV_CODE).maybeSingle();
   let circleId = (await find()).data?.id ?? (await createDemoCircle());
   circleId ??= (await find()).data?.id ?? null;
-  if (!circleId) throw new Error("Could not open the demo circle.");
+  if (!circleId) throw new Error("Could not open the demo family.");
 
   let { data: member } = await supabase
     .from("members")
@@ -106,13 +106,13 @@ export async function devOpenAction(role: Role, destination: string): Promise<vo
       .select("id, name, role")
       .single());
   }
-  if (!member) throw new Error("Could not open the demo circle.");
+  if (!member) throw new Error("Could not open the demo family.");
 
   await createSession({ circleId, memberId: member.id, name: member.name, role: member.role as Role });
   redirect(destination);
 }
 
-/** Dev mode only: leaves the demo circle and returns to the landing page. */
+/** Dev mode only: leaves the demo family and returns to the landing page. */
 export async function devSignOutAction(): Promise<void> {
   if (!devAccessEnabled()) notFound();
   await clearSession();

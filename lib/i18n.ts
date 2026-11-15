@@ -9,7 +9,7 @@ import type { VoiceLanguage } from "@/lib/voice/language";
 
 const en = {
   // Shell
-  circleLine: (elder: string, member: string) => `${elder}'s care circle, signed in as ${member}`,
+  circleLine: (elder: string, member: string) => `${elder}'s family, signed in as ${member}`,
   settings: "Settings",
   signOut: "Sign out",
   textSize: "Text size",
@@ -91,7 +91,7 @@ const en = {
   notSetUp: "The Companion is not set up yet. Add an Adaption API key to turn it on.",
   disclaimer: "Not a doctor, and never changes a dose. In an emergency, call 112.",
   answersFrom: (grounded: boolean) =>
-    `Answers come from Adaption AI using this circle's own schedule${
+    `Answers come from Adaption AI using this family's own schedule${
       grounded ? " and a care-guidance dataset prepared with Adaption Adaptive Data" : ""
     }.`,
 

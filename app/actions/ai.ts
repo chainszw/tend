@@ -105,7 +105,7 @@ export interface CompanionResult {
   message?: string;
 }
 
-/** Answers a Care Companion question using the circle's own care record. */
+/** Answers a Care Companion question using the family's own care record. */
 export async function askCompanionAction(messages: unknown, language?: unknown): Promise<CompanionResult> {
   const session = await requireSession();
   if (!adaptionConfigured()) return { ok: false, message: NOT_CONFIGURED };

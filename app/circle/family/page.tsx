@@ -61,7 +61,7 @@ export default async function FamilyPage({ searchParams }: PageProps<"/circle/fa
       {query.welcome ? (
         <p role="status" className="flex items-start gap-3 rounded-2xl bg-leaf-soft p-4 text-lg font-bold text-primary">
           <PartyPopper aria-hidden="true" className="mt-0.5 size-6 shrink-0" />
-          The care circle is ready. Send an invite below, then add the first medicine.
+          The family is ready. Send an invite below, then add the first medicine.
         </p>
       ) : null}
 
@@ -80,7 +80,7 @@ export default async function FamilyPage({ searchParams }: PageProps<"/circle/fa
 
       <section aria-labelledby="members-heading" className={CARD}>
         <h2 id="members-heading" className="text-2xl font-extrabold">
-          In this circle
+          In this family
         </h2>
         <ul className="mt-3 flex flex-col divide-y-2 divide-border">
           {members.map((member) => (
@@ -141,7 +141,7 @@ export default async function FamilyPage({ searchParams }: PageProps<"/circle/fa
           <Disclosure summary="When are emails sent?">
             <p className="text-muted-foreground">
               {circle.elder_name} gets an email 30 minutes before a dose. If a dose is not marked
-              within an hour, everyone in the circle is told. Visits are announced the day before
+              within an hour, everyone in the family is told. Visits are announced the day before
               and 2 hours before.
             </p>
           </Disclosure>
