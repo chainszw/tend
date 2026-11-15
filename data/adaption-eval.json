@@ -1,11 +1,12 @@
 {
   "datasetName": "tend-eldercare-guidance",
-  "rows": 0,
-  "status": "not_run",
-  "gradeBefore": null,
-  "gradeAfter": null,
-  "scoreBefore": null,
-  "scoreAfter": null,
-  "improvementPercent": null,
-  "evaluatedAt": null
+  "rows": 48,
+  "status": "evaluated",
+  "gradeBefore": "C",
+  "gradeAfter": "B",
+  "scoreBefore": 6,
+  "scoreAfter": 8.3,
+  "improvementPercent": 38.3,
+  "evaluatedAt": "2026-11-15T05:46:05.570Z",
+  "datasetId": "78c54868-b2b5-447b-ba40-77ba5c7f6b51"
 }

@@ -54,11 +54,13 @@ Last updated: 2026-11-15 ~11:05 IST.
 - [x] Screens written: landing, create, join, Today, Medicines (+prescription import),
       Visits, Ask (Companion), Family
 - [x] 82 unit tests green, lint clean, tsc clean, README written
-- [x] Adaption dataset (48 rows) + `scripts/adaption-dataset.ts` written (NOT yet run)
-- [ ] USER: fill `.env.local` (Supabase URL + service-role key, Adaption key, Gmail user +
-      app password) and run `supabase/schema.sql`
-- [ ] Signed-in flows tested end to end in the browser (blocked on the env values above)
-- [ ] Adaption: verify model ids with `GET /api/v1/models`; run `npm run adaption:dataset`;
+- [x] Adaption dataset (48 rows) + `scripts/adaption-dataset.ts` written and run
+- [x] Supabase URL + secret key set, `schema.sql` run (7 tables verified)
+- [x] Gmail SMTP set (reminders.tend@gmail.com), login + test send verified
+- [x] Signed-in flows tested end to end in the browser (create, prescription import, dose log, visit + AI prep, Companion, digest, reminders email, join + wrong passcode, cron 401/200)
+- [x] Adaption key set; model ids verified; chat model switched qwen3.5-397b → `gemma-4-31b-it` (qwen is a reasoning model: burned the whole token cap on reasoning → empty replies, ~20s)
+- [x] Adaption dataset adapted (id 78c54868…): grade C→B, score 6→8.3 (+38.3%), saved to `data/adaption-eval.json`
+- [ ] Adaption:
       USER creates an Inference Stack in the Adaption app → set `ADAPTION_STACK_SLUG`
 - [ ] GitHub repo public, Vercel deploy (set env vars + APP_URL), run `supabase/cron.sql`
 - [ ] Production smoke test, submission #1, final submission #2
@@ -70,5 +72,4 @@ Last updated: 2026-11-15 ~11:05 IST.
   (docs are inconsistent); the script falls back to the key in the pre-signed URL path.
 
 ## Next step
-Get env values from the user, then test create → join → add medicine → log dose →
-appointment → Companion → reminders in the browser, fix what breaks, then deploy.
+Design overhaul (user will brief), then deploy.

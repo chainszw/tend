@@ -3,7 +3,7 @@ import { optionalEnv, requireEnv } from "@/lib/env";
 
 const BASE_URL = "https://api.prod.adaptionlabs.ai/api/v1";
 const TIMEOUT_MS = 45_000;
-const DEFAULT_CHAT_MODEL = "qwen3.5-397b";
+const DEFAULT_CHAT_MODEL = "gemma-4-31b-it";
 const DEFAULT_FAST_MODEL = "deepseek-v4-flash";
 
 export interface AdaptionMessage {
