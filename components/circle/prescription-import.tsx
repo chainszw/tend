@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ScanText, Trash2 } from "lucide-react";
+import { useRef, useState, useTransition, type ChangeEvent } from "react";
+import { Camera, ScanText, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { importPrescriptionAction } from "@/app/actions/ai";
+import { importPrescriptionAction, scanPrescriptionAction } from "@/app/actions/ai";
 import { saveImportedMedicationsAction } from "@/app/actions/medications";
 import { FormMessage } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input, Textarea } from "@/components/ui/input";
 import type { MedicationDraft } from "@/lib/ai-parse";
+import { shrinkImage } from "@/lib/image-resize";
 
 const EXAMPLE = `Tab. Metformin 500 mg, 1 tablet twice daily after food
 Tab. Amlodipine 5 mg, once daily in the morning for blood pressure
@@ -27,7 +28,7 @@ interface Draft extends MedicationDraft {
 }
 
 /**
- * Paste a prescription, let Adaption read it into medicines, then review and
+ * Scan or paste a prescription, let Adaption read it into medicines, then review and
  * correct every line before anything is saved. Nothing is added automatically.
  */
 export function PrescriptionImport({ today }: { today: string }) {
@@ -35,7 +36,9 @@ export function PrescriptionImport({ today }: { today: string }) {
   const [text, setText] = useState("");
   const [drafts, setDrafts] = useState<Draft[] | null>(null);
   const [error, setError] = useState<string>();
+  const [scanning, setScanning] = useState(false);
   const [pending, startTransition] = useTransition();
+  const photoInput = useRef<HTMLInputElement>(null);
 
   function reset() {
     setText("");
@@ -51,6 +54,32 @@ export function PrescriptionImport({ today }: { today: string }) {
         setDrafts(result.drafts.map((draft, index) => ({ ...draft, key: index })));
       } else {
         setError(result.message);
+      }
+    });
+  }
+
+  function scan(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Clear the input so the same photo can be picked again after a retry.
+    event.target.value = "";
+    if (!file) return;
+    setError(undefined);
+    setScanning(true);
+    startTransition(async () => {
+      try {
+        const formData = new FormData();
+        formData.append("photo", await shrinkImage(file), file.name || "prescription.jpg");
+        const result = await scanPrescriptionAction(formData);
+        if (result.text) setText(result.text);
+        if (result.ok && result.drafts) {
+          setDrafts(result.drafts.map((draft, index) => ({ ...draft, key: index })));
+        } else {
+          setError(result.message);
+        }
+      } catch {
+        setError("The photo could not be sent. Check your connection and try again.");
+      } finally {
+        setScanning(false);
       }
     });
   }
@@ -105,7 +134,7 @@ export function PrescriptionImport({ today }: { today: string }) {
           <DialogDescription>
             {drafts
               ? "Compare each line with the prescription and fix anything that is wrong. Nothing is saved until you choose Save."
-              : "Type or paste the text from a prescription or medicine label. Tend turns it into a schedule for you to check."}
+              : "Take a photo of a prescription or medicine label, or type the text. Tend turns it into a schedule for you to check."}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,8 +199,30 @@ export function PrescriptionImport({ today }: { today: string }) {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
+            <input
+              ref={photoInput}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="sr-only"
+              tabIndex={-1}
+              aria-hidden="true"
+              onChange={scan}
+            />
+            <Button
+              type="button"
+              size="lg"
+              disabled={pending}
+              onClick={() => photoInput.current?.click()}
+            >
+              <Camera aria-hidden="true" />
+              {scanning ? "Reading the photo…" : "Scan with camera"}
+            </Button>
+            <p className="-mt-2 text-[0.95rem] text-muted-foreground">
+              On a computer this lets you choose a photo instead.
+            </p>
             <label htmlFor="prescription-text" className="font-bold">
-              Prescription text
+              Or type or paste the text
             </label>
             <Textarea
               id="prescription-text"
@@ -183,15 +234,19 @@ export function PrescriptionImport({ today }: { today: string }) {
             />
             <FormMessage message={error} />
             <div className="flex flex-wrap gap-3">
-              <Button type="button" disabled={pending || text.trim().length < 10} onClick={read}>
-                {pending ? "Reading…" : "Read the prescription"}
+              <Button type="button" variant="outline" disabled={pending || text.trim().length < 10} onClick={read}>
+                {pending && !scanning ? "Reading…" : "Read the text"}
               </Button>
               <Button type="button" variant="quiet" disabled={pending} onClick={() => setText(EXAMPLE)}>
                 Use an example
               </Button>
             </div>
             <p aria-live="polite" className="text-[0.95rem] text-muted-foreground">
-              {pending ? "Reading the text. This can take a few seconds." : "Read by Adaption AI. Always check the result against the prescription."}
+              {scanning
+                ? "Reading the photo. This can take up to half a minute."
+                : pending
+                  ? "Reading the text. This can take a few seconds."
+                  : "Read by Adaption AI. Always check the result against the prescription."}
             </p>
           </div>
         )}

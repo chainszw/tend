@@ -3,11 +3,13 @@ import {
   appointmentSchema,
   changePasscodeSchema,
   chatSchema,
+  checkPrescriptionImage,
   createCircleSchema,
   doseLogSchema,
   fieldErrors,
   isValidTimeZone,
   joinCircleSchema,
+  MAX_PRESCRIPTION_IMAGE_BYTES,
   medicationSchema,
   prescriptionTextSchema,
 } from "@/lib/validation";
@@ -138,5 +140,23 @@ describe("changePasscodeSchema", () => {
   it("rejects short or non-numeric passcodes", () => {
     expect(changePasscodeSchema.safeParse({ passcode: "20481" }).success).toBe(false);
     expect(changePasscodeSchema.safeParse({ passcode: "abcdef" }).success).toBe(false);
+  });
+});
+
+describe("checkPrescriptionImage", () => {
+  it("accepts common photo formats under the size limit", () => {
+    expect(checkPrescriptionImage({ type: "image/jpeg", size: 400_000 })).toBeUndefined();
+    expect(checkPrescriptionImage({ type: "image/webp", size: 2_000_000 })).toBeUndefined();
+  });
+
+  it("rejects other file types", () => {
+    expect(checkPrescriptionImage({ type: "application/pdf", size: 1000 })).toMatch(/photo/);
+    expect(checkPrescriptionImage({ type: "image/svg+xml", size: 1000 })).toMatch(/photo/);
+    expect(checkPrescriptionImage({ type: "image/heic", size: 1000 })).toMatch(/photo/);
+  });
+
+  it("rejects empty and oversized photos", () => {
+    expect(checkPrescriptionImage({ type: "image/png", size: 0 })).toMatch(/empty/);
+    expect(checkPrescriptionImage({ type: "image/png", size: MAX_PRESCRIPTION_IMAGE_BYTES + 1 })).toMatch(/too large/);
   });
 });

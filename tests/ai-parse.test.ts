@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   cleanModelText,
+  cleanTranscription,
   extractJson,
+  MAX_TRANSCRIPTION_CHARS,
   parseMedicationDrafts,
   parseQuestions,
 } from "@/lib/ai-parse";
@@ -74,5 +76,20 @@ describe("parseQuestions", () => {
   it("keeps up to six non-empty questions", () => {
     const output = JSON.stringify({ questions: ["A?", " ", 4, "B?", "C?", "D?", "E?", "F?", "G?"] });
     expect(parseQuestions(output)).toEqual(["A?", "B?", "C?", "D?", "E?", "F?"]);
+  });
+});
+
+describe("cleanTranscription", () => {
+  it("returns the transcribed text, trimmed", () => {
+    expect(cleanTranscription("  Tab. Metformin 500 mg BD \n")).toBe("Tab. Metformin 500 mg BD");
+  });
+
+  it("treats NO_TEXT or nothing as nothing read", () => {
+    expect(cleanTranscription(" NO_TEXT\n")).toBe("");
+    expect(cleanTranscription("<think>looking</think>")).toBe("");
+  });
+
+  it("caps very long transcriptions", () => {
+    expect(cleanTranscription("a".repeat(9000))).toHaveLength(MAX_TRANSCRIPTION_CHARS);
   });
 });

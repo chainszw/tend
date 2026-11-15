@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
   // Standalone output keeps a container deploy (e.g. Cloud Run) available.
   output: "standalone",
   poweredByHeader: false,
+  experimental: {
+    // Prescription photos are shrunk in the browser; this leaves room for the rest.
+    serverActions: { bodySizeLimit: "5mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -98,6 +98,25 @@ export const prescriptionTextSchema = z.object({
   text: z.string().trim().min(10, "Paste the prescription or label text").max(4000),
 });
 
+export const PRESCRIPTION_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+/** Largest prescription photo accepted (the client shrinks photos well below this). */
+export const MAX_PRESCRIPTION_IMAGE_BYTES = 4 * 1024 * 1024;
+
+/** Checks an uploaded prescription photo. Returns an error message, or undefined if it is fine. */
+export function checkPrescriptionImage(file: { type: string; size: number }): string | undefined {
+  if (!(PRESCRIPTION_IMAGE_TYPES as readonly string[]).includes(file.type)) {
+    return "Please use a JPEG, PNG or WebP photo.";
+  }
+  if (file.size === 0) return "That photo is empty. Please take it again.";
+  if (file.size > MAX_PRESCRIPTION_IMAGE_BYTES) return "That photo is too large. Please take it again.";
+  return undefined;
+}
+
 /** Flattens a zod error into one message per field for form display. */
 export function fieldErrors(error: z.ZodError): Record<string, string> {
   const result: Record<string, string> = {};

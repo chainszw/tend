@@ -6,9 +6,14 @@ const TIMEOUT_MS = 45_000;
 const DEFAULT_CHAT_MODEL = "gemma-4-31b-it";
 const DEFAULT_FAST_MODEL = "deepseek-v4-flash";
 
+export type AdaptionContentPart =
+  | { type: "input_text"; text: string }
+  | { type: "input_image"; image_url: string };
+
 export interface AdaptionMessage {
   role: "user" | "assistant";
-  content: string;
+  /** Plain text, or text and image parts for models that can see images. */
+  content: string | AdaptionContentPart[];
 }
 
 export interface RespondOptions {

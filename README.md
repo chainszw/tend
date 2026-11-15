@@ -21,8 +21,8 @@ Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Manag
 
 All AI features call [Adaption](https://docs.adaptionlabs.ai) from the server (`lib/adaption.ts`).
 
-1. **Prescription import** (`lib/ai.ts`, `extractMedications`): pasted prescription or label
-   text is read into structured medicines by the Responses API. The result is validated with
+1. **Prescription import** (`lib/ai.ts`, `extractMedications`): a prescription is scanned with
+   the phone camera (the vision model transcribes the photo) or pasted as text, and the text is read into structured medicines by the Responses API. The result is validated with
    zod, and a person reviews and corrects every line before anything is saved.
 2. **Care Companion** (`companionReply`): answers questions in plain language using the
    circle's own medicines, today's doses, adherence and visits. It is grounded on a

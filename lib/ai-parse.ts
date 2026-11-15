@@ -10,6 +10,19 @@ export function cleanModelText(text: string): string {
     .trim();
 }
 
+/** Reply the model is told to give when a photo holds no readable prescription. */
+export const NO_TEXT = "NO_TEXT";
+
+/** Longest transcription we pass on (matches `prescriptionTextSchema`). */
+export const MAX_TRANSCRIPTION_CHARS = 4000;
+
+/** Cleans a photo transcription. Returns "" when nothing readable was found. */
+export function cleanTranscription(modelText: string): string {
+  const text = cleanModelText(modelText);
+  if (!text || text === NO_TEXT) return "";
+  return text.slice(0, MAX_TRANSCRIPTION_CHARS).trim();
+}
+
 /**
  * Pulls the first JSON object or array out of model output. Models have no
  * strict JSON mode here, so we tolerate prose around the JSON.

@@ -1,6 +1,6 @@
 "use server";
 
-import { companionReply, extractMedications, writeDigest } from "@/lib/ai";
+import { companionReply, extractMedications, transcribePrescriptionImage, writeDigest } from "@/lib/ai";
 import { adaptionConfigured } from "@/lib/adaption";
 import type { MedicationDraft } from "@/lib/ai-parse";
 import {
@@ -14,7 +14,7 @@ import { createRateLimiter } from "@/lib/rate-limit";
 import { requireSession } from "@/lib/session";
 import { loadSnapshot } from "@/lib/snapshot";
 import { ROLE_LABELS } from "@/lib/types";
-import { chatSchema, prescriptionTextSchema } from "@/lib/validation";
+import { chatSchema, checkPrescriptionImage, prescriptionTextSchema } from "@/lib/validation";
 
 const allowAi = createRateLimiter(20, 5 * 60_000);
 const NOT_CONFIGURED = "The AI helper is not set up yet.";
@@ -44,6 +44,56 @@ export async function importPrescriptionAction(text: string): Promise<ImportResu
   } catch (error) {
     console.error("Prescription import failed:", error);
     return { ok: false, message: "The AI helper could not read that just now. Try again, or add the medicine by hand." };
+  }
+}
+
+export interface ScanResult extends ImportResult {
+  /** What was read from the photo, so it can be checked and corrected. */
+  text?: string;
+}
+
+/** Reads a prescription photo and turns its text into medicine drafts, both with Adaption. */
+export async function scanPrescriptionAction(formData: FormData): Promise<ScanResult> {
+  const session = await requireSession();
+  if (!adaptionConfigured()) return { ok: false, message: NOT_CONFIGURED };
+  if (!allowAi(session.memberId)) return { ok: false, message: SLOW_DOWN };
+
+  const photo = formData.get("photo");
+  if (!(photo instanceof File)) return { ok: false, message: "Please take or choose a photo." };
+  const problem = checkPrescriptionImage(photo);
+  if (problem) return { ok: false, message: problem };
+
+  let text: string;
+  try {
+    text = await transcribePrescriptionImage(new Uint8Array(await photo.arrayBuffer()), photo.type);
+  } catch (error) {
+    console.error("Prescription scan failed:", error);
+    return { ok: false, message: "The photo could not be read just now. Try again, or type the prescription in." };
+  }
+  if (text.length < 10) {
+    return {
+      ok: false,
+      message: "We could not read a prescription in that photo. Try again in good light, or type it in.",
+    };
+  }
+
+  try {
+    const drafts = await extractMedications(text);
+    if (drafts.length === 0) {
+      return {
+        ok: false,
+        text,
+        message: "No medicines were found in that photo. Check the text below, or add the medicine by hand.",
+      };
+    }
+    return { ok: true, text, drafts };
+  } catch (error) {
+    console.error("Prescription import failed:", error);
+    return {
+      ok: false,
+      text,
+      message: "The AI helper could not read that just now. Check the text below and try again.",
+    };
   }
 }
 
