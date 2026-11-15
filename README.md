@@ -4,6 +4,8 @@
 manage medicines and doctor visits in one place, and get an email when something is due or
 has been missed.
 
+**Live:** https://tend-software.vercel.app
+
 Built for the PromptWars × Catalyst challenge: *Elderly Care & Medication Management Platform*.
 
 ## Contents

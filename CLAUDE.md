@@ -111,7 +111,12 @@ Last updated: 2026-11-15 ~15:30 IST.
       `lib/voice/language.ts`, note in Settings); browser tab = `app/icon.svg` capsule + title
       "Tend" (template `Tend | %s`); README rewritten feature by feature; 143 tests green.
       `APP_URL` is optional on Vercel (falls back to `VERCEL_PROJECT_PRODUCTION_URL`).
-- [ ] Vercel deploy (set env vars; `APP_URL` optional), run `supabase/cron.sql`
+- [x] Vercel deploy: https://tend-software.vercel.app (project `arahant1/tend`, auto-deploys on
+      push to `main`). `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` come from the Vercel Supabase
+      integration (same project as local); the other secrets were added with `vercel env add`.
+      `ADAPTION_STACK_SLUG` is still unset. Public pages, tab title/icon, Beta pill, cron 401 checked;
+      a real sign-in on production is NOT yet verified.
+- [ ] Run `supabase/cron.sql` with the live URL (USER, in the Supabase SQL editor)
 - [ ] Production smoke test, submission #1, final submission #2
 
 ## Known gaps / ideas if time allows
