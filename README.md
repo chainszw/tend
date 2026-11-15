@@ -201,7 +201,7 @@ view.
 - **nodemailer + Gmail SMTP** for email.
 - **React Three Fiber + drei** for the device.
 - **Pure logic** (schedule, adherence, reminders, parsing, device, voice, translations)
-  lives in `lib/` and is covered by 143 Vitest unit tests.
+  lives in `lib/` and is covered by 148 Vitest unit tests.
 
 ```
 app/            pages, server actions, the cron route
@@ -226,8 +226,12 @@ npm run dev
 2. Fill in `.env.local` (`.env.example` explains each value).
 3. Optional: `npm run adaption:dataset` adapts and evaluates the guidance dataset.
 
-In `npm run dev` only, the public pages show a **Developer shortcut** that signs straight
-into a seeded demo circle. It does not exist in a production build.
+### Dev mode: every screen without signing in
+A **Dev mode** button sits in the bottom-right corner of every page. Open it, pick a role
+(Elder, Family or Caretaker) and jump straight to Today, Medicines, Visits, Health, Ask,
+Family or the 3D device in a ready-made demo circle, with no circle code or passcode. It
+is always on in `npm run dev`; in production it appears only when `DEV_MODE=on` is set,
+and it can open nothing except the demo circle.
 
 ## Deploy
 

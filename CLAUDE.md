@@ -71,9 +71,13 @@ Last updated: 2026-11-15 ~15:30 IST.
       "check reminders" button removed)
 - [x] `supabase/migrations/002_passcode_enc.sql` run in Supabase; invite flow browser-tested
       (reveal, share, link pre-fill, change passcode, old-circle reset prompt, 390px phone)
-- [x] Dev shortcut: in `npm run dev` only (`lib/dev.ts`, NODE_ENV === "development"), the public
-      pages show "Developer shortcut" buttons that sign straight into demo circle `DEMO-0000`
-      (auto-seeded: 3 members, 4 medicines, 1 visit; random unknown passcode). Absent in prod.
+- [x] Dev mode (`lib/dev-mode.ts` pure + `tests/dev-mode.test.ts`, `components/dev/*`, `app/actions/dev.ts`):
+      a "Dev mode" button fixed bottom-right on EVERY page (root layout). Opens a panel: role
+      (Elder/Family/Caretaker) + one button per screen (Today, Medicines, Visits, Health, Ask, Family,
+      3D device). `devOpenAction(role, destination)` signs into demo circle `DEMO-0000` (auto-seeded:
+      3 members, 4 medicines, 1 visit; random unknown passcode) and redirects; destinations are
+      allow-listed. Always on in `next dev`; in production only when env `DEV_MODE=on` (set on Vercel
+      for the judges; remove it to disable).
 - [x] Prescription camera scan: "Scan with camera" (native camera / photo picker) → photo shrunk
       in browser (`lib/image-resize.ts`) → `scanPrescriptionAction` → Adaption `gemma-4-31b-it`
       transcribes the image (`input_image` data URL, verified working) → extraction → review.
